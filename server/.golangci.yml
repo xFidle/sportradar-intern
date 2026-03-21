@@ -1,0 +1,29 @@
+version: "2"
+issues:
+    max-same-issues: 50
+run:
+    go: "1.26"
+    timeout: 5m
+    tests: true
+linters:
+    enable:
+        - gocritic
+        - govet
+        - gocyclo
+        - staticcheck
+        - misspell
+        - unconvert
+        - unparam
+        - unused
+        - whitespace
+    settings:
+        gocyclo:
+            min-complexity: 15
+formatters:
+    enable:
+        - gofmt
+        - goimports
+        - golines
+    settings:
+        golines:
+            max-len: 120
