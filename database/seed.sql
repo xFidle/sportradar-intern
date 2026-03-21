@@ -187,6 +187,7 @@ INSERT INTO competition_teams (_competition_id, _team_id) VALUES
 (4, 39),
 (4, 40);
 
+/* the same as for logos - photos will be prefixed with storage URL */ 
 INSERT INTO players (_team_id, _country_id, first_name, last_name, shirt_number, birth_date, height, photo_path) VALUES
 (1, 5, 'Thibaut', 'Courtois', 1, '1992-05-11', 199, 'players/thibaut_courtois.png'),
 (1, 40, 'Dani', 'Carvajal', 2, '1992-01-11', 173, 'players/dani_carvajal.png'),
@@ -521,7 +522,7 @@ INSERT INTO players (_team_id, _country_id, first_name, last_name, shirt_number,
 (40, 45, 'Eddie', 'Jackson', 4, '1993-12-10', 183, 'players/eddie_jackson.png'),
 (40, 45, 'Teven', 'Jenkins', 76, '1998-12-02', 198, 'players/teven_jenkins.png'),
 (40, 45, 'Darnell', 'Wright', 58, '2001-08-10', 196, 'players/darnell_wright.png'),
-(40, 45, 'Caleb', 'Williams', 18, '2001-11-18', 185, 'players/caleb_williams.png'));
+(40, 45, 'Caleb', 'Williams', 18, '2001-11-18', 185, 'players/caleb_williams.png');
 
 INSERT INTO venues (_city_id, name, capacity) VALUES
 (1, 'Santiago Bernabeu', 81),
