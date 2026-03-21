@@ -19,6 +19,16 @@ services:
       timeout: 5s 
       retries: 3
 
+  fileserver:
+    container_name: sportradar-fileserver
+    image: busybox:latest 
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./storage:/www:ro,z
+    command: httpd -f -p 9000 -h /www
+    restart: unless-stopped
+
 volumes:
   sportradar-data:
 
