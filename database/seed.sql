@@ -107,7 +107,7 @@ INSERT INTO teams (_sport_id, _city_id, name, abbreviation, logo_path, descripti
 (1, 1, 'Real Madrid', 'RMA', 'teams/real_madrid.png', NULL),
 (1, 2, 'FC Barcelona', 'FCB', 'teams/fc_barcelona.png', NULL),
 (1, 3, 'Bayern Munich', 'BAY', 'teams/bayern_munich.png', NULL),
-(1, 4, 'Paris Saint-Germain', 'PSG', 'teams/paris_saint_germain.png', NULL),
+(1, 4, 'Paris SG', 'PSG', 'teams/paris_sg.png', NULL),
 (1, 5, 'Manchester City', 'MCI', 'teams/manchester_city.png', NULL),
 (1, 6, 'Liverpool', 'LIV', 'teams/liverpool.png', NULL),
 (1, 7, 'Juventus', 'JUV', 'teams/juventus.png', NULL),
