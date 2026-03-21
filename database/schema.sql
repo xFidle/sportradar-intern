@@ -32,10 +32,19 @@ CREATE TABLE teams (
     _city_id INTEGER,
     name VARCHAR(128) NOT NULL,
     abbreviation VARCHAR(3) NOT NULL,
-    logo_path VARCHAR(256) NOT NULL,
+    logo_path VARCHAR(256),
     description TEXT,
     CONSTRAINT fk_teams_sport FOREIGN KEY (_sport_id) REFERENCES sports(sport_id) ON DELETE CASCADE,
     CONSTRAINT fk_teams_city FOREIGN KEY (_city_id) REFERENCES cities(city_id) ON DELETE SET NULL
+);
+
+CREATE TABLE competition_teams (
+    competition_team_id SERIAL PRIMARY KEY,
+    _competition_id INTEGER NOT NULL,
+    _team_id INTEGER NOT NULL,
+    CONSTRAINT fk_competition_teams_competition FOREIGN KEY (_competition_id) REFERENCES competitions(competition_id) ON DELETE CASCADE,
+    CONSTRAINT fk_competition_teams_team FOREIGN KEY (_team_id) REFERENCES teams(team_id) ON DELETE CASCADE,
+    UNIQUE (_competition_id, _team_id)
 );
 
 CREATE TABLE players (
@@ -43,11 +52,11 @@ CREATE TABLE players (
     _team_id INTEGER NOT NULL,
     _country_id INTEGER,
     first_name VARCHAR(64) NOT NULL,
-    second_name VARCHAR(64) NOT NULL,
+    last_name VARCHAR(64) NOT NULL,
     shirt_number INTEGER NOT NULL,
     birth_date DATE NOT NULL,
     height INTEGER  NOT NULL,
-    photo_path VARCHAR(256) NOT NULL,
+    photo_path VARCHAR(256),
     CONSTRAINT fk_players_team FOREIGN KEY (_team_id) REFERENCES teams(team_id) ON DELETE RESTRICT,
     CONSTRAINT fk_players_country FOREIGN KEY (_country_id) REFERENCES countries(country_id) ON DELETE SET NULL,
     CHECK (shirt_number > 0 AND shirt_number < 100),
