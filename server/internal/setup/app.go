@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/xFidle/sportradar-intern/server/db"
+	"github.com/xFidle/sportradar-intern/server/internal/db"
 )
 
 type bootstrap struct {

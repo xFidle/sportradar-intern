@@ -4,7 +4,7 @@ import (
 	"os"
 
 	_ "github.com/joho/godotenv/autoload"
-	"github.com/xFidle/sportradar-intern/server/db"
+	"github.com/xFidle/sportradar-intern/server/internal/db"
 )
 
 type config struct {
