@@ -8,8 +8,8 @@ CREATE TYPE COMPETITION_TYPE AS ENUM ('tournament', 'league', 'friendly', 'other
 CREATE TABLE competitions (
     competition_id SERIAL PRIMARY KEY,
     _sport_id INT NOT NULL,
-    type COMPETITION_TYPE not NULL,
-    name VARCHAR(256),
+    type COMPETITION_TYPE NOT NULL,
+    name VARCHAR(256) NOT NULL,
     CONSTRAINT fk_competitions_sport FOREIGN KEY (_sport_id) REFERENCES sports(sport_id) ON DELETE CASCADE
 );
 
