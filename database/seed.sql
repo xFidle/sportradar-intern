@@ -1,5 +1,3 @@
-BEGIN;
-
 INSERT INTO sports (name) VALUES
 ('soccer'),
 ('ice hockey'),
@@ -635,5 +633,3 @@ INSERT INTO stages (name, round_order) VALUES
 ('1/4', 5),
 ('1/2', 6),
 ('final', 7);
-
-COMMIT;
