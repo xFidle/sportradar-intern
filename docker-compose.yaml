@@ -31,6 +31,8 @@ services:
     depends_on:
       database:
         condition: service_healthy
+      fileserver:
+        condition: service_healthy
     restart: unless-stopped
 
   fileserver:
@@ -42,6 +44,11 @@ services:
       - ./storage:/www:ro,z
     command: httpd -f -p 9000 -h /www
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- localhost:9000/ > /dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s 
+      retries: 3
 
 volumes:
   sportradar-data:
