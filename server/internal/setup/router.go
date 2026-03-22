@@ -23,9 +23,8 @@ func registerRoutes() http.Handler {
 		MaxAge:           300,
 	}))
 
-	r.Get("/hello", func(w http.ResponseWriter, r *http.Request) {
-
+	r.Route("/api", func(r chi.Router) {
+		r.Get("/event")
 	})
-
 	return r
 }
