@@ -19,6 +19,20 @@ services:
       timeout: 5s 
       retries: 3
 
+  server:
+    container_name: sportradar-server
+    ports:
+      - "8080:8080"
+    build:
+      context: ./server
+      dockerfile: dockerfile
+    env_file:
+      - ./server/.env
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: unless-stopped
+
   fileserver:
     container_name: sportradar-fileserver
     image: busybox:latest 
