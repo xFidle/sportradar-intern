@@ -1,7 +1,7 @@
 package models
 
 type Player struct {
-	PlayerID   int     `json:"player_id"`
+	PlayerID   int32   `json:"player_id"`
 	FirstName  string  `json:"first_name"`
 	SecondName string  `json:"second_name"`
 	Country    Country `json:"country"`
@@ -10,7 +10,7 @@ type Player struct {
 type DetailedPlayer struct {
 	Player
 	SportName string `json:"sport_name"`
-	Height    int    `json:"height"`
-	Age       int    `json:"age"`
+	Height    int32  `json:"height"`
+	Age       int32  `json:"age"`
 	Photo     string `json:"photo"`
 }

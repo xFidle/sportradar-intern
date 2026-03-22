@@ -11,7 +11,7 @@ const (
 )
 
 type Event struct {
-	EventID         int       `json:"event_id"`
+	EventID         int32     `json:"event_id"`
 	StartTime       time.Time `json:"start_time"`
 	EndTime         time.Time `json:"end_time"`
 	Status          Status    `json:"status"`
@@ -25,9 +25,9 @@ type DetailedEvent struct {
 }
 
 type Filter struct {
-	StartDate     string `json:"start_date"`
-	EndDate       string `json:"end_date"`
-	SportID       *int   `json:"sport_id,omitempty"`
-	CompetitionID *int   `json:"competition_id,omitempty"`
-	TeamID        *int   `json:"team_id,omitempty"`
+	StartAfter    time.Time `json:"start_after" validate:"required"`
+	EndBefore     time.Time `json:"end_before" validate:"required"`
+	SportID       *int32    `json:"sport_id,omitempty"`
+	CompetitionID *int32    `json:"competition_id,omitempty"`
+	TeamIDs       []int32   `json:"team_ids,omitempty"`
 }

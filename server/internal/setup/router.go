@@ -8,7 +8,7 @@ import (
 	"github.com/go-chi/cors"
 )
 
-func registerRoutes() http.Handler {
+func registerRoutes(t transport) http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
@@ -24,7 +24,7 @@ func registerRoutes() http.Handler {
 	}))
 
 	r.Route("/api", func(r chi.Router) {
-		r.Get("/event")
+		r.Post("/events", t.event.HandleGetEvents)
 	})
 	return r
 }

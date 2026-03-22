@@ -1,8 +1,8 @@
 version: "2"
 sql:
   - engine: "postgresql"
-    queries: "sql"
-    schema: "sql"
+    queries: "sql/queries.sql"
+    schema: "../database/schema.sql"
     gen:
       go:
         emit_interface: true

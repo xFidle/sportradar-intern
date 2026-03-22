@@ -1,7 +1,7 @@
 package models
 
 type Team struct {
-	TeamID       int    `json:"team_id"`
+	TeamID       int32  `json:"team_id"`
 	Name         string `json:"name"`
 	Abbreviation string `json:"abbreviation"`
 	Logo         string `json:"logo"`
