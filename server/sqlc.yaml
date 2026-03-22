@@ -1,0 +1,17 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "sql"
+    schema: "sql"
+    gen:
+      go:
+        emit_interface: true
+        emit_pointers_for_null_types: true
+        package: "repo"
+        out: "internal/repo"
+        sql_package: "pgx/v5"
+        overrides:
+          - db_type: "timestamptz"
+            go_type:
+              import: "time"
+              type: "Time"
