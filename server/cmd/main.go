@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/xFidle/sportradar-intern/server/setup"
+	"github.com/xFidle/sportradar-intern/server/internal/setup"
 )
 
 func gracefulShutdown(apiServer *http.Server, done chan bool) {
