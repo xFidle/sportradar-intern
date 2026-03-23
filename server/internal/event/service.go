@@ -14,8 +14,9 @@ import (
 )
 
 type Service struct {
-	db *pgxpool.Pool
-	q  *repo.Queries
+	bucketAddr string
+	db         *pgxpool.Pool
+	q          *repo.Queries
 }
 
 func New(db *pgxpool.Pool) *Service {

@@ -6,9 +6,18 @@ import (
 )
 
 var (
-	InvalidPayloadError  = HError{Code: http.StatusBadRequest, Message: "invalid payload format"}
-	InternalFailureError = HError{Code: http.StatusInternalServerError, Message: "internal processing failure"}
-	ValidationError      = HError{Code: http.StatusUnprocessableEntity, Message: "invalid payload, validation failed"}
+	InvalidPayloadError = HError{
+		Code:    http.StatusBadRequest,
+		Message: "invalid payload format",
+	}
+	InternalFailureError = HError{
+		Code:    http.StatusInternalServerError,
+		Message: "internal processing failure",
+	}
+	ValidationError = HError{
+		Code:    http.StatusUnprocessableEntity,
+		Message: "invalid payload, validation failed",
+	}
 )
 
 type HError struct {

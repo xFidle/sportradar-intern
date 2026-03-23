@@ -41,12 +41,12 @@ func newBootstrap() *bootstrap {
 }
 
 func (b *bootstrap) initStorage() {
-	b.storage.db = db.Must(b.config.database)
-	b.closers = append(b.closers, b.storage.db)
+	b.db = db.Must(b.config.database)
+	b.closers = append(b.closers, b.db)
 }
 
 func (b *bootstrap) initServices() {
-	b.services.event = event.New(b.storage.db.Handle())
+	b.services.event = event.New(b.db.Handle())
 }
 
 func (b *bootstrap) initTransport() {
