@@ -2,104 +2,77 @@ package event
 
 import (
 	"context"
-	"fmt"
-	"maps"
-	"slices"
-	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/jinzhu/copier"
 	"github.com/xFidle/sportradar-intern/server/internal/models"
-	"github.com/xFidle/sportradar-intern/server/internal/repo"
+	"github.com/xFidle/sportradar-intern/server/internal/util"
 )
 
+const layout = "2006-01-02"
+
 type Service struct {
-	fAddr string
-	db    *pgxpool.Pool
-	q     *repo.Queries
+	loader *loader
 }
 
 func New(db *pgxpool.Pool, fileserverAddr string) *Service {
-	return &Service{
-		fAddr: fileserverAddr,
-		db:    db,
-		q:     repo.New(db),
-	}
+	return &Service{loader: newLoader(db, fileserverAddr)}
 }
 
 func (s *Service) GetEvent(ctx context.Context, id int32) (*models.DetailedEvent, error) {
-	return nil, nil
+	event, err := s.loader.fetchEventByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	teams, err := s.loader.fetchTeamsByEventID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	teamIDs := util.Map(teams, func(t models.DetailedTeam) int32 { return t.TeamID })
+	players, err := s.loader.fetchPlayersByTeamID(ctx, teamIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	lookup := make(map[int32]*models.DetailedTeam)
+	for i := range teams {
+		lookup[teams[i].TeamID] = &teams[i]
+	}
+
+	for _, p := range players {
+		if t := lookup[p.teamID]; t != nil {
+			t.Players = append(t.Players, p.player)
+		}
+	}
+
+	event.Participants = teams
+
+	return event, nil
 }
 
 func (s *Service) GetEvents(ctx context.Context, filter models.Filter) ([]models.Event, error) {
-	events, err := s.listBaseEvents(ctx, filter)
+	events, err := s.loader.fetchEventsByFilter(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := s.populateTeams(ctx, events); err != nil {
-		return nil, err
-	}
-
-	return events, nil
-}
-
-func (s *Service) listBaseEvents(ctx context.Context, filter models.Filter) ([]models.Event, error) {
-	params := repo.ListFilteredEventsParams{}
-	if err := copier.Copy(&params, &filter); err != nil {
-		return nil, err
-	}
-
-	layout := "2006-01-02"
-	after, err := time.Parse(layout, filter.StartAfter)
+	eventIDs := util.Map(events, func(e models.Event) int32 { return e.EventID })
+	teams, err := s.loader.fetchTeamsByEventIDs(ctx, eventIDs)
 	if err != nil {
 		return nil, err
 	}
 
-	before, err := time.Parse(layout, filter.EndBefore)
-	if err != nil {
-		return nil, err
-	}
-
-	params.StartAfter = after
-	params.EndBefore = before
-
-	rows, err := s.q.ListFilteredEvents(ctx, params)
-	if err != nil {
-		return nil, err
-	}
-
-	var events []models.Event
-	if err := copier.Copy(&events, &rows); err != nil {
-		return nil, err
-	}
-
-	return events, nil
-}
-
-func (s *Service) populateTeams(ctx context.Context, events []models.Event) error {
 	lookup := make(map[int32]*models.Event)
 	for i := range events {
 		lookup[events[i].EventID] = &events[i]
 	}
 
-	rows, err := s.q.ListEventTeams(ctx, slices.Collect(maps.Keys(lookup)))
-	if err != nil {
-		return err
-	}
-
-	for _, row := range rows {
-		var team models.Team
-		if err := copier.Copy(&team, &row); err != nil {
-			return err
-		}
-		team.LogoPath = fmt.Sprintf("%s/%s", s.fAddr, team.LogoPath)
-
-		if e := lookup[row.EventID]; e != nil {
-			e.Participants = append(e.Participants, team)
-			fmt.Println(e.Participants)
+	for _, t := range teams {
+		if e := lookup[t.eventID]; e != nil {
+			e.Participants = append(e.Participants, t.team)
 		}
 	}
 
-	return nil
+	return events, nil
 }

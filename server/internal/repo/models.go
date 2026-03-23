@@ -180,7 +180,6 @@ type Event struct {
 	Status        Status
 	StartTime     time.Time
 	EndTime       time.Time
-	Description   *string
 }
 
 type Participant struct {
@@ -232,7 +231,6 @@ type Team struct {
 	Name         string
 	Abbreviation string
 	LogoPath     *string
-	Description  *string
 }
 
 type Venue struct {

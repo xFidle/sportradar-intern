@@ -9,8 +9,11 @@ import (
 )
 
 type Querier interface {
-	ListEventTeams(ctx context.Context, eventIds []int32) ([]ListEventTeamsRow, error)
-	ListFilteredEvents(ctx context.Context, arg ListFilteredEventsParams) ([]ListFilteredEventsRow, error)
+	GetDetailedEventByID(ctx context.Context, eventID int32) (GetDetailedEventByIDRow, error)
+	ListDetailedTeamsByEventID(ctx context.Context, eventID int32) ([]ListDetailedTeamsByEventIDRow, error)
+	ListEventsByFilter(ctx context.Context, arg ListEventsByFilterParams) ([]ListEventsByFilterRow, error)
+	ListPlayersByTeamIDs(ctx context.Context, teamIds []int32) ([]ListPlayersByTeamIDsRow, error)
+	ListTeamsByEventsIDs(ctx context.Context, eventIds []int32) ([]ListTeamsByEventsIDsRow, error)
 }
 
 var _ Querier = (*Queries)(nil)

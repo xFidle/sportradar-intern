@@ -24,6 +24,7 @@ func registerRoutes(t transport) http.Handler {
 	}))
 
 	r.Route("/api", func(r chi.Router) {
+		r.Get("/event", t.event.HandleGetEvent)
 		r.Post("/events", t.event.HandleGetEvents)
 	})
 	return r

@@ -1,4 +1,50 @@
--- name: ListFilteredEvents :many
+-- name: GetDetailedEventByID :one
+SELECT 
+    e.event_id, 
+    e.start_time,
+    e.end_time,
+    e.status,
+    s.name AS sport_name,
+    c.name AS competition_name,
+    v.name AS venue_name
+FROM events e
+JOIN venues v ON v.venue_id = e._venue_id 
+JOIN competitions c ON c.competition_id = e._competition_id
+JOIN sports s ON s.sport_id = c._sport_id 
+WHERE e.event_id = sqlc.arg('event_id');
+
+
+-- name: ListDetailedTeamsByEventID :many
+SELECT 
+    p._event_id,
+    t.team_id,
+    t.name,
+    t.abbreviation,
+    t.logo_path,
+    ci.name AS city_name,
+    co.name AS country_name,
+    co.code AS country_code
+FROM participants p
+JOIN teams t ON t.team_id = p._team_id
+JOIN cities ci ON ci.city_id = t._city_id
+JOIN countries co ON co.country_id = ci._country_id
+WHERE p._event_id = sqlc.arg('event_id');
+
+
+-- name: ListPlayersByTeamIDs :many
+SELECT
+    p.player_id,
+    p._team_id,
+    p.first_name,
+    p.last_name,
+    co.name AS country_name,
+    co.code AS country_code
+FROM players p
+JOIN countries co ON co.country_id = p._country_id
+WHERE p._team_id = ANY(sqlc.arg('team_ids')::int[]);
+       
+
+-- name: ListEventsByFilter :many
 SELECT 
     e.event_id, 
     e.start_time,
@@ -15,12 +61,12 @@ WHERE
     AND c._sport_id = COALESCE(sqlc.narg('sport_id'), c._sport_id) 
     AND e._competition_id = COALESCE(sqlc.narg('competition_id'), e._competition_id) 
     AND sqlc.narg('team_ids')::int[] IS NULL OR EXISTS 
-      (SELECT 1
-      FROM participants p
+      (SELECT 1 FROM participants p
       WHERE p._event_id = e.event_id
         AND p._team_id = ANY(sqlc.narg('team_ids')::int[]));
 
--- name: ListEventTeams :many 
+
+-- name: ListTeamsByEventsIDs :many 
 SELECT 
     p._event_id,
     t.team_id,
@@ -28,6 +74,5 @@ SELECT
     t.abbreviation,
     t.logo_path
 FROM participants p
-JOIN teams t ON t.team_id =  p._team_id
+JOIN teams t ON t.team_id = p._team_id
 WHERE p._event_id = ANY(sqlc.arg('event_ids')::int[]);
-     

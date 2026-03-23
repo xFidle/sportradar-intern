@@ -10,41 +10,93 @@ import (
 	"time"
 )
 
-const listEventTeams = `-- name: ListEventTeams :many
+const getDetailedEventByID = `-- name: GetDetailedEventByID :one
+SELECT 
+    e.event_id, 
+    e.start_time,
+    e.end_time,
+    e.status,
+    s.name AS sport_name,
+    c.name AS competition_name,
+    v.name AS venue_name
+FROM events e
+JOIN venues v ON v.venue_id = e._venue_id 
+JOIN competitions c ON c.competition_id = e._competition_id
+JOIN sports s ON s.sport_id = c._sport_id 
+WHERE e.event_id = $1
+`
+
+type GetDetailedEventByIDRow struct {
+	EventID         int32
+	StartTime       time.Time
+	EndTime         time.Time
+	Status          Status
+	SportName       string
+	CompetitionName string
+	VenueName       string
+}
+
+func (q *Queries) GetDetailedEventByID(ctx context.Context, eventID int32) (GetDetailedEventByIDRow, error) {
+	row := q.db.QueryRow(ctx, getDetailedEventByID, eventID)
+	var i GetDetailedEventByIDRow
+	err := row.Scan(
+		&i.EventID,
+		&i.StartTime,
+		&i.EndTime,
+		&i.Status,
+		&i.SportName,
+		&i.CompetitionName,
+		&i.VenueName,
+	)
+	return i, err
+}
+
+const listDetailedTeamsByEventID = `-- name: ListDetailedTeamsByEventID :many
 SELECT 
     p._event_id,
     t.team_id,
     t.name,
     t.abbreviation,
-    t.logo_path
+    t.logo_path,
+    ci.name AS city_name,
+    co.name AS country_name,
+    co.code AS country_code
 FROM participants p
-JOIN teams t ON t.team_id =  p._team_id
-WHERE p._event_id = ANY($1::int[])
+JOIN teams t ON t.team_id = p._team_id
+JOIN cities ci ON ci.city_id = t._city_id
+JOIN countries co ON co.country_id = ci._country_id
+WHERE p._event_id = $1
 `
 
-type ListEventTeamsRow struct {
+type ListDetailedTeamsByEventIDRow struct {
 	EventID      int32
 	TeamID       int32
 	Name         string
 	Abbreviation string
 	LogoPath     *string
+	CityName     string
+	CountryName  string
+	CountryCode  string
 }
 
-func (q *Queries) ListEventTeams(ctx context.Context, eventIds []int32) ([]ListEventTeamsRow, error) {
-	rows, err := q.db.Query(ctx, listEventTeams, eventIds)
+func (q *Queries) ListDetailedTeamsByEventID(ctx context.Context, eventID int32) ([]ListDetailedTeamsByEventIDRow, error) {
+	rows, err := q.db.Query(ctx, listDetailedTeamsByEventID, eventID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListEventTeamsRow
+	var items []ListDetailedTeamsByEventIDRow
 	for rows.Next() {
-		var i ListEventTeamsRow
+		var i ListDetailedTeamsByEventIDRow
 		if err := rows.Scan(
 			&i.EventID,
 			&i.TeamID,
 			&i.Name,
 			&i.Abbreviation,
 			&i.LogoPath,
+			&i.CityName,
+			&i.CountryName,
+			&i.CountryCode,
 		); err != nil {
 			return nil, err
 		}
@@ -56,7 +108,7 @@ func (q *Queries) ListEventTeams(ctx context.Context, eventIds []int32) ([]ListE
 	return items, nil
 }
 
-const listFilteredEvents = `-- name: ListFilteredEvents :many
+const listEventsByFilter = `-- name: ListEventsByFilter :many
 SELECT 
     e.event_id, 
     e.start_time,
@@ -73,13 +125,12 @@ WHERE
     AND c._sport_id = COALESCE($3, c._sport_id) 
     AND e._competition_id = COALESCE($4, e._competition_id) 
     AND $5::int[] IS NULL OR EXISTS 
-      (SELECT 1
-      FROM participants p
+      (SELECT 1 FROM participants p
       WHERE p._event_id = e.event_id
         AND p._team_id = ANY($5::int[]))
 `
 
-type ListFilteredEventsParams struct {
+type ListEventsByFilterParams struct {
 	StartAfter    time.Time
 	EndBefore     time.Time
 	SportID       *int32
@@ -87,7 +138,7 @@ type ListFilteredEventsParams struct {
 	TeamIds       []int32
 }
 
-type ListFilteredEventsRow struct {
+type ListEventsByFilterRow struct {
 	EventID         int32
 	StartTime       time.Time
 	EndTime         time.Time
@@ -96,8 +147,8 @@ type ListFilteredEventsRow struct {
 	CompetitionName string
 }
 
-func (q *Queries) ListFilteredEvents(ctx context.Context, arg ListFilteredEventsParams) ([]ListFilteredEventsRow, error) {
-	rows, err := q.db.Query(ctx, listFilteredEvents,
+func (q *Queries) ListEventsByFilter(ctx context.Context, arg ListEventsByFilterParams) ([]ListEventsByFilterRow, error) {
+	rows, err := q.db.Query(ctx, listEventsByFilter,
 		arg.StartAfter,
 		arg.EndBefore,
 		arg.SportID,
@@ -108,9 +159,9 @@ func (q *Queries) ListFilteredEvents(ctx context.Context, arg ListFilteredEvents
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListFilteredEventsRow
+	var items []ListEventsByFilterRow
 	for rows.Next() {
-		var i ListFilteredEventsRow
+		var i ListEventsByFilterRow
 		if err := rows.Scan(
 			&i.EventID,
 			&i.StartTime,
@@ -118,6 +169,101 @@ func (q *Queries) ListFilteredEvents(ctx context.Context, arg ListFilteredEvents
 			&i.Status,
 			&i.SportName,
 			&i.CompetitionName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listPlayersByTeamIDs = `-- name: ListPlayersByTeamIDs :many
+SELECT
+    p.player_id,
+    p._team_id,
+    p.first_name,
+    p.last_name,
+    co.name AS country_name,
+    co.code AS country_code
+FROM players p
+JOIN countries co ON co.country_id = p._country_id
+WHERE p._team_id = ANY($1::int[])
+`
+
+type ListPlayersByTeamIDsRow struct {
+	PlayerID    int32
+	TeamID      int32
+	FirstName   string
+	LastName    string
+	CountryName string
+	CountryCode string
+}
+
+func (q *Queries) ListPlayersByTeamIDs(ctx context.Context, teamIds []int32) ([]ListPlayersByTeamIDsRow, error) {
+	rows, err := q.db.Query(ctx, listPlayersByTeamIDs, teamIds)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListPlayersByTeamIDsRow
+	for rows.Next() {
+		var i ListPlayersByTeamIDsRow
+		if err := rows.Scan(
+			&i.PlayerID,
+			&i.TeamID,
+			&i.FirstName,
+			&i.LastName,
+			&i.CountryName,
+			&i.CountryCode,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listTeamsByEventsIDs = `-- name: ListTeamsByEventsIDs :many
+SELECT 
+    p._event_id,
+    t.team_id,
+    t.name,
+    t.abbreviation,
+    t.logo_path
+FROM participants p
+JOIN teams t ON t.team_id = p._team_id
+WHERE p._event_id = ANY($1::int[])
+`
+
+type ListTeamsByEventsIDsRow struct {
+	EventID      int32
+	TeamID       int32
+	Name         string
+	Abbreviation string
+	LogoPath     *string
+}
+
+func (q *Queries) ListTeamsByEventsIDs(ctx context.Context, eventIds []int32) ([]ListTeamsByEventsIDsRow, error) {
+	rows, err := q.db.Query(ctx, listTeamsByEventsIDs, eventIds)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListTeamsByEventsIDsRow
+	for rows.Next() {
+		var i ListTeamsByEventsIDsRow
+		if err := rows.Scan(
+			&i.EventID,
+			&i.TeamID,
+			&i.Name,
+			&i.Abbreviation,
+			&i.LogoPath,
 		); err != nil {
 			return nil, err
 		}

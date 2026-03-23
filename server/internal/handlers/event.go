@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/xFidle/sportradar-intern/server/internal/httpx"
 	"github.com/xFidle/sportradar-intern/server/internal/models"
@@ -23,7 +24,21 @@ func NewEventHandler(svc EventService) *EventHandler {
 }
 
 func (h *EventHandler) HandleGetEvent(w http.ResponseWriter, r *http.Request) {
+	eventID, err := strconv.Atoi(r.URL.Query().Get("event_id"))
+	if err != nil {
+		httpx.LogError(err, r)
+		httpx.WriteError(w, httpx.InvalidPayloadError)
+		return
+	}
 
+	event, err := h.svc.GetEvent(context.TODO(), int32(eventID))
+	if err != nil {
+		httpx.LogError(err, r)
+		httpx.WriteError(w, httpx.InternalFailureError)
+		return
+	}
+
+	httpx.WriteJSON(w, http.StatusOK, event)
 }
 
 func (h *EventHandler) HandleGetEvents(w http.ResponseWriter, r *http.Request) {
