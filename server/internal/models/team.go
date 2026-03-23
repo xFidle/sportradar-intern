@@ -4,7 +4,7 @@ type Team struct {
 	TeamID       int32  `json:"team_id"`
 	Name         string `json:"name"`
 	Abbreviation string `json:"abbreviation"`
-	Logo         string `json:"logo"`
+	LogoPath     string `json:"logo"`
 }
 
 type DetailedTeam struct {

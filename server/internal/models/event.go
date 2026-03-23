@@ -25,9 +25,9 @@ type DetailedEvent struct {
 }
 
 type Filter struct {
-	StartAfter    time.Time `json:"start_after" validate:"required"`
-	EndBefore     time.Time `json:"end_before" validate:"required"`
-	SportID       *int32    `json:"sport_id,omitempty"`
-	CompetitionID *int32    `json:"competition_id,omitempty"`
-	TeamIDs       []int32   `json:"team_ids,omitempty"`
+	StartAfter    string  `json:"start_after" validate:"required"`
+	EndBefore     string  `json:"end_before" validate:"required"`
+	SportID       *int32  `json:"sport_id,omitempty"`
+	CompetitionID *int32  `json:"competition_id,omitempty"`
+	TeamIDs       []int32 `json:"team_ids,omitempty"`
 }
