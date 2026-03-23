@@ -9,6 +9,7 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/xFidle/sportradar-intern/server/internal/models"
 	"github.com/xFidle/sportradar-intern/server/internal/repo"
+	"github.com/xFidle/sportradar-intern/server/internal/util"
 )
 
 // loader aggregates queries from SQLC and maps models to domain ones
@@ -94,15 +95,8 @@ func (l *loader) fetchEventsByFilter(ctx context.Context, filter models.Filter) 
 		return nil, err
 	}
 
-	after, err := time.Parse(layout, filter.StartAfter)
-	if err != nil {
-		return nil, err
-	}
-
-	before, err := time.Parse(layout, filter.EndBefore)
-	if err != nil {
-		return nil, err
-	}
+	after, _ := time.Parse(util.DateLayout, filter.StartAfter)
+	before, _ := time.Parse(util.DateLayout, filter.EndBefore)
 
 	params.StartAfter = after
 	params.EndBefore = before

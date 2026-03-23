@@ -8,8 +8,6 @@ import (
 	"github.com/xFidle/sportradar-intern/server/internal/util"
 )
 
-const layout = "2006-01-02"
-
 type Service struct {
 	loader *loader
 }
