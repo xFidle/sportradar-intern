@@ -46,7 +46,7 @@ func (b *bootstrap) initStorage() {
 }
 
 func (b *bootstrap) initServices() {
-	b.services.event = event.New(b.db.Handle())
+	b.services.event = event.New(b.db.Handle(), b.config.fileserverAddr)
 }
 
 func (b *bootstrap) initTransport() {

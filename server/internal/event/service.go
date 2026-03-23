@@ -14,15 +14,16 @@ import (
 )
 
 type Service struct {
-	bucketAddr string
-	db         *pgxpool.Pool
-	q          *repo.Queries
+	fAddr string
+	db    *pgxpool.Pool
+	q     *repo.Queries
 }
 
-func New(db *pgxpool.Pool) *Service {
+func New(db *pgxpool.Pool, fileserverAddr string) *Service {
 	return &Service{
-		db: db,
-		q:  repo.New(db),
+		fAddr: fileserverAddr,
+		db:    db,
+		q:     repo.New(db),
 	}
 }
 
@@ -92,6 +93,7 @@ func (s *Service) populateTeams(ctx context.Context, events []models.Event) erro
 		if err := copier.Copy(&team, &row); err != nil {
 			return err
 		}
+		team.LogoPath = fmt.Sprintf("%s/%s", s.fAddr, team.LogoPath)
 
 		if e := lookup[row.EventID]; e != nil {
 			e.Participants = append(e.Participants, team)

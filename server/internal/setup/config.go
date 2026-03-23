@@ -8,13 +8,15 @@ import (
 )
 
 type config struct {
-	port     string
-	database db.Config
+	port           string
+	fileserverAddr string
+	database       db.Config
 }
 
 func loadConfig() config {
 	return config{
-		port: os.Getenv("PORT"),
+		port:           os.Getenv("PORT"),
+		fileserverAddr: os.Getenv("FILESERVER_ADDR"),
 		database: db.Config{
 			Host:     os.Getenv("DB_HOST"),
 			Port:     os.Getenv("DB_PORT"),
