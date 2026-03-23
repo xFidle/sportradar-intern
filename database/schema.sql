@@ -33,7 +33,6 @@ CREATE TABLE teams (
     name VARCHAR(128) NOT NULL,
     abbreviation VARCHAR(3) NOT NULL,
     logo_path VARCHAR(256),
-    description TEXT,
     CONSTRAINT fk_teams_sport FOREIGN KEY (_sport_id) REFERENCES sports(sport_id) ON DELETE CASCADE,
     CONSTRAINT fk_teams_city FOREIGN KEY (_city_id) REFERENCES cities(city_id) ON DELETE SET NULL
 );
@@ -98,7 +97,6 @@ CREATE TABLE events (
     status STATUS NOT NULL,
     start_time TIMESTAMPTZ NOT NULL,
     end_time TIMESTAMPTZ NOT NULL,
-    description TEXT,
     CONSTRAINT fk_events_competition FOREIGN KEY (_competition_id) REFERENCES competitions(competition_id) ON DELETE CASCADE,
     CONSTRAINT fk_events_venue FOREIGN KEY (_venue_id) REFERENCES venues(venue_id) ON DELETE RESTRICT,
     CONSTRAINT fk_events_stage FOREIGN KEY (_stage_id) REFERENCES stages(stage_id) ON DELETE RESTRICT,
