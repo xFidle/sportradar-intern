@@ -53,8 +53,8 @@ func (q *Queries) GetDetailedEventByID(ctx context.Context, eventID int32) (GetD
 
 const listCompetitionsBySportID = `-- name: ListCompetitionsBySportID :many
 SELECT 
-    competition_id,
-    name
+    c.competition_id,
+    c.name
 FROM competitions c
 WHERE c._sport_id = $1
 `
@@ -400,6 +400,57 @@ func (q *Queries) ListTeamsByEventsIDs(ctx context.Context, eventIds []int32) ([
 			&i.Name,
 			&i.Abbreviation,
 			&i.LogoPath,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listVenuesBySportID = `-- name: ListVenuesBySportID :many
+SELECT 
+    v.venue_id,
+    v.name,
+    v.capacity,
+    ci.name AS city_name,
+    co.name AS country_name,
+    co.code AS country_code
+FROM venues v
+JOIN playgrounds p ON p._venue_id = v.venue_id
+JOIN cities ci ON ci.city_id = v._city_id
+JOIN countries co ON co.country_id = ci._country_id
+WHERE p._sport_id = $1
+`
+
+type ListVenuesBySportIDRow struct {
+	VenueID     int32
+	Name        string
+	Capacity    int16
+	CityName    string
+	CountryName string
+	CountryCode string
+}
+
+func (q *Queries) ListVenuesBySportID(ctx context.Context, sportID int32) ([]ListVenuesBySportIDRow, error) {
+	rows, err := q.db.Query(ctx, listVenuesBySportID, sportID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListVenuesBySportIDRow
+	for rows.Next() {
+		var i ListVenuesBySportIDRow
+		if err := rows.Scan(
+			&i.VenueID,
+			&i.Name,
+			&i.Capacity,
+			&i.CityName,
+			&i.CountryName,
+			&i.CountryCode,
 		); err != nil {
 			return nil, err
 		}

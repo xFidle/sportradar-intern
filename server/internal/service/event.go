@@ -16,6 +16,10 @@ func NewEventService(db *pgxpool.Pool, fileserverAddr string) *EventService {
 	return &EventService{loader: newLoader(db, fileserverAddr)}
 }
 
+func (s *EventService) CreateEvent(ctx context.Context, req models.CreateEventReq) (*models.DetailedEvent, error) {
+
+}
+
 func (s *EventService) GetEvent(ctx context.Context, id int32) (*models.DetailedEvent, error) {
 	event, err := s.loader.fetchEventByID(ctx, id)
 	if err != nil {

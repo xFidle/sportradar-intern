@@ -93,11 +93,25 @@ SELECT * FROM sports;
 
 -- name: ListCompetitionsBySportID :many
 SELECT 
-    competition_id,
-    name
+    c.competition_id,
+    c.name
 FROM competitions c
 WHERE c._sport_id = sqlc.arg('sport_id');
 
+
+-- name: ListVenuesBySportID :many
+SELECT 
+    v.venue_id,
+    v.name,
+    v.capacity,
+    ci.name AS city_name,
+    co.name AS country_name,
+    co.code AS country_code
+FROM venues v
+JOIN playgrounds p ON p._venue_id = v.venue_id
+JOIN cities ci ON ci.city_id = v._city_id
+JOIN countries co ON co.country_id = ci._country_id
+WHERE p._sport_id = sqlc.arg('sport_id');
 
 -- name: ListTeamsByCompetitionID :many
 SELECT 

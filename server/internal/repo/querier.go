@@ -18,6 +18,7 @@ type Querier interface {
 	ListSports(ctx context.Context) ([]Sport, error)
 	ListTeamsByCompetitionID(ctx context.Context, competitionID int32) ([]ListTeamsByCompetitionIDRow, error)
 	ListTeamsByEventsIDs(ctx context.Context, eventIds []int32) ([]ListTeamsByEventsIDsRow, error)
+	ListVenuesBySportID(ctx context.Context, sportID int32) ([]ListVenuesBySportIDRow, error)
 }
 
 var _ Querier = (*Queries)(nil)
