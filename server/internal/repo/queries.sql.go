@@ -229,6 +229,42 @@ func (q *Queries) ListPlayersByTeamIDs(ctx context.Context, teamIds []int32) ([]
 	return items, nil
 }
 
+const listScoresByEventID = `-- name: ListScoresByEventID :many
+SELECT
+    p._team_id,
+    s.segment,
+    s.score
+FROM participants p
+JOIN scores s ON s._participant_id = p.participant_id
+WHERE p._event_id = $1
+`
+
+type ListScoresByEventIDRow struct {
+	TeamID  int32
+	Segment int16
+	Score   int32
+}
+
+func (q *Queries) ListScoresByEventID(ctx context.Context, eventID int32) ([]ListScoresByEventIDRow, error) {
+	rows, err := q.db.Query(ctx, listScoresByEventID, eventID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListScoresByEventIDRow
+	for rows.Next() {
+		var i ListScoresByEventIDRow
+		if err := rows.Scan(&i.TeamID, &i.Segment, &i.Score); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listTeamsByEventsIDs = `-- name: ListTeamsByEventsIDs :many
 SELECT 
     p._event_id,

@@ -76,3 +76,12 @@ SELECT
 FROM participants p
 JOIN teams t ON t.team_id = p._team_id
 WHERE p._event_id = ANY(sqlc.arg('event_ids')::int[]);
+
+-- name: ListScoresByEventID :many
+SELECT
+    p._team_id,
+    s.segment,
+    s.score
+FROM participants p
+JOIN scores s ON s._participant_id = p.participant_id
+WHERE p._event_id = sqlc.arg('event_id');

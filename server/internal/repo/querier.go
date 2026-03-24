@@ -13,6 +13,7 @@ type Querier interface {
 	ListDetailedTeamsByEventID(ctx context.Context, eventID int32) ([]ListDetailedTeamsByEventIDRow, error)
 	ListEventsByFilter(ctx context.Context, arg ListEventsByFilterParams) ([]ListEventsByFilterRow, error)
 	ListPlayersByTeamIDs(ctx context.Context, teamIds []int32) ([]ListPlayersByTeamIDsRow, error)
+	ListScoresByEventID(ctx context.Context, eventID int32) ([]ListScoresByEventIDRow, error)
 	ListTeamsByEventsIDs(ctx context.Context, eventIds []int32) ([]ListTeamsByEventsIDsRow, error)
 }
 

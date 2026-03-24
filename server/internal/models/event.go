@@ -21,7 +21,6 @@ type baseEvent struct {
 
 type Event struct {
 	baseEvent
-	FinalScore   string `json:"final_score"`
 	Participants []Team `json:"participants"`
 }
 

@@ -33,6 +33,11 @@ func (s *Service) GetEvent(ctx context.Context, id int32) (*models.DetailedEvent
 		return nil, err
 	}
 
+	scores, err := s.loader.fetchScoresByEventID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
 	lookup := make(map[int32]*models.DetailedTeam)
 	for i := range teams {
 		lookup[teams[i].TeamID] = &teams[i]
@@ -45,6 +50,7 @@ func (s *Service) GetEvent(ctx context.Context, id int32) (*models.DetailedEvent
 	}
 
 	event.Participants = teams
+	event.Scores = scores
 
 	return event, nil
 }

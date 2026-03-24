@@ -138,3 +138,17 @@ func (l *loader) fetchTeamsByEventIDs(ctx context.Context, eventIDs []int32) ([]
 
 	return result, nil
 }
+
+func (l *loader) fetchScoresByEventID(ctx context.Context, id int32) ([]models.Score, error) {
+	rows, err := l.q.ListScoresByEventID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	var scores []models.Score
+	if err := copier.Copy(&scores, &rows); err != nil {
+		return nil, err
+	}
+
+	return scores, nil
+}
