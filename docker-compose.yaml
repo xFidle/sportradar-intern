@@ -19,6 +19,21 @@ services:
       timeout: 5s 
       retries: 3
 
+  fileserver:
+    container_name: sportradar-fileserver
+    image: busybox:latest 
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./storage:/www:ro,z
+    command: httpd -f -p 9000 -h /www
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- localhost:9000/init > /dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s 
+      retries: 3
+
   server:
     container_name: sportradar-server
     ports:
@@ -34,21 +49,6 @@ services:
       fileserver:
         condition: service_healthy
     restart: unless-stopped
-
-  fileserver:
-    container_name: sportradar-fileserver
-    image: busybox:latest 
-    ports:
-      - "9000:9000"
-    volumes:
-      - ./storage:/www:ro,z
-    command: httpd -f -p 9000 -h /www
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- localhost:9000/ > /dev/null 2>&1"]
-      interval: 10s
-      timeout: 5s 
-      retries: 3
 
 volumes:
   sportradar-data:
