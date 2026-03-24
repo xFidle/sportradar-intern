@@ -152,3 +152,17 @@ func (l *loader) fetchScoresByEventID(ctx context.Context, id int32) ([]models.S
 
 	return scores, nil
 }
+
+func (l *loader) checkVenueCorrectnes(ctx context.Context, competitionID, venueID int32) (bool, error) {
+	params := repo.IsVenueValidForCompetitionParams{CompetitionID: competitionID, VenueID: venueID}
+	return l.q.IsVenueValidForCompetition(ctx, params)
+}
+
+func (l *loader) checkTeamsCorrectness(ctx context.Context, competitionID int32, teamIDs []int32) (bool, error) {
+	params := repo.CountValidTeamsForCompetitionParams{CompetitionID: competitionID, TeamIds: teamIDs}
+	count, err := l.q.CountValidTeamsForCompetition(ctx, params)
+	if err != nil {
+		return false, err
+	}
+	return count == int64(len(teamIDs)), err
+}

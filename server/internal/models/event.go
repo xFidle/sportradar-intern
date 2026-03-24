@@ -13,7 +13,6 @@ const (
 type baseEvent struct {
 	EventID         int32     `json:"event_id"`
 	StartTime       time.Time `json:"start_time"`
-	EndTime         time.Time `json:"end_time"`
 	Status          Status    `json:"status"`
 	SportName       string    `json:"sport_name"`
 	CompetitionName string    `json:"competition_name"`

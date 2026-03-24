@@ -1,3 +1,31 @@
+-- name: InsertEvent :one
+INSERT INTO events (_competition_id, _venue_id, _stage_id, status, start_time) 
+VALUES (sqlc.arg('competition_id'), sqlc.arg('venue_id'), sqlc.arg('stage_id'), sqlc.arg('status'), sqlc.arg('start_time'))
+RETURNING event_id;
+
+-- name: InsertParticipants :exec
+INSERT INTO participants (_event_id, _team_id) 
+SELECT 
+    sqlc.arg('event_id'),
+    unnest(sqlc.arg('teams_ids')::int[]);
+
+-- name: IsVenueValidForCompetition :one
+SELECT EXISTS (
+    SELECT 1
+    FROM competitions c
+    JOIN playgrounds p on p._sport_id = c._sport_id
+    WHERE 
+        c.competition_id = sqlc.arg('competition_id')
+        AND p._venue_id = sqlc.arg('venue_id')
+);
+
+-- name: CountValidTeamsForCompetition :one
+SELECT COUNT(DISTINCT ct._team_id)
+FROM competition_teams ct
+WHERE 
+    ct._competition_id = sqlc.arg('competition_id')
+    AND ct._team_id = ANY(sqlc.arg('team_ids')::int[]);
+
 -- name: GetDetailedEventByID :one
 SELECT 
     e.event_id, 
@@ -48,7 +76,6 @@ WHERE p._team_id = ANY(sqlc.arg('team_ids')::int[]);
 SELECT 
     e.event_id, 
     e.start_time,
-    e.end_time,
     e.status,
     s.name AS sport_name,
     c.name AS competition_name 
@@ -57,7 +84,7 @@ JOIN competitions c ON c.competition_id = e._competition_id
 JOIN sports s ON s.sport_id = c._sport_id 
 WHERE 
     e.start_time >= sqlc.arg('start_after')
-    AND e.end_time <= sqlc.arg('end_before')
+    AND e.start_time <= sqlc.arg('end_before')
     AND c._sport_id = COALESCE(sqlc.narg('sport_id'), c._sport_id) 
     AND e._competition_id = COALESCE(sqlc.narg('competition_id'), e._competition_id) 
     AND sqlc.narg('team_ids')::int[] IS NULL OR EXISTS 

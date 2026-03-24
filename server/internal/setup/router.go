@@ -24,13 +24,14 @@ func registerRoutes(t transport) http.Handler {
 	}))
 
 	r.Route("/api", func(r chi.Router) {
-		r.Route("/event", func(r chi.Router) {
+		r.Route("/events", func(r chi.Router) {
 			r.Get("/{event_id}", t.event.HandleGetEvent)
-			r.Post("/", t.event.HandleGetEvents) // It is a post method because filter is needed as body
+			r.Post("/", t.event.HandlePostEvent)
+			r.Post("/filter", t.event.HandleGetEvents) // It is a post method because filter is needed as body
 		})
 
 		r.Route("/sports", func(r chi.Router) {
-			r.Get("/{sport_id}", t.sport.HandleGetSports)
+			r.Get("/", t.sport.HandleGetSports)
 			r.Get("/{sport_id}/competitions", t.eventOptions.HandleGetCompetitionsBySport)
 			r.Get("/{sport_id}/event-options", t.eventOptions.HandleGetEventOptionsBySport)
 		})

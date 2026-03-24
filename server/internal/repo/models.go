@@ -179,7 +179,7 @@ type Event struct {
 	StageID       int32
 	Status        Status
 	StartTime     time.Time
-	EndTime       time.Time
+	EndTime       pgtype.Timestamptz
 }
 
 type Participant struct {

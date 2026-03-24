@@ -8,7 +8,29 @@ package repo
 import (
 	"context"
 	"time"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
+
+const countValidTeamsForCompetition = `-- name: CountValidTeamsForCompetition :one
+SELECT COUNT(DISTINCT ct._team_id)
+FROM competition_teams ct
+WHERE 
+    ct._competition_id = $1
+    AND ct._team_id = ANY($2::int[])
+`
+
+type CountValidTeamsForCompetitionParams struct {
+	CompetitionID int32
+	TeamIds       []int32
+}
+
+func (q *Queries) CountValidTeamsForCompetition(ctx context.Context, arg CountValidTeamsForCompetitionParams) (int64, error) {
+	row := q.db.QueryRow(ctx, countValidTeamsForCompetition, arg.CompetitionID, arg.TeamIds)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
 
 const getDetailedEventByID = `-- name: GetDetailedEventByID :one
 SELECT 
@@ -29,7 +51,7 @@ WHERE e.event_id = $1
 type GetDetailedEventByIDRow struct {
 	EventID         int32
 	StartTime       time.Time
-	EndTime         time.Time
+	EndTime         pgtype.Timestamptz
 	Status          Status
 	SportName       string
 	CompetitionName string
@@ -49,6 +71,73 @@ func (q *Queries) GetDetailedEventByID(ctx context.Context, eventID int32) (GetD
 		&i.VenueName,
 	)
 	return i, err
+}
+
+const insertEvent = `-- name: InsertEvent :one
+INSERT INTO events (_competition_id, _venue_id, _stage_id, status, start_time) 
+VALUES ($1, $2, $3, $4, $5)
+RETURNING event_id
+`
+
+type InsertEventParams struct {
+	CompetitionID int32
+	VenueID       int32
+	StageID       int32
+	Status        Status
+	StartTime     time.Time
+}
+
+func (q *Queries) InsertEvent(ctx context.Context, arg InsertEventParams) (int32, error) {
+	row := q.db.QueryRow(ctx, insertEvent,
+		arg.CompetitionID,
+		arg.VenueID,
+		arg.StageID,
+		arg.Status,
+		arg.StartTime,
+	)
+	var event_id int32
+	err := row.Scan(&event_id)
+	return event_id, err
+}
+
+const insertParticipants = `-- name: InsertParticipants :exec
+INSERT INTO participants (_event_id, _team_id) 
+SELECT 
+    $1,
+    unnest($2::int[])
+`
+
+type InsertParticipantsParams struct {
+	EventID  int32
+	TeamsIds []int32
+}
+
+func (q *Queries) InsertParticipants(ctx context.Context, arg InsertParticipantsParams) error {
+	_, err := q.db.Exec(ctx, insertParticipants, arg.EventID, arg.TeamsIds)
+	return err
+}
+
+const isVenueValidForCompetition = `-- name: IsVenueValidForCompetition :one
+SELECT EXISTS (
+    SELECT 1
+    FROM competitions c
+    JOIN playgrounds p on p._sport_id = c._sport_id
+    WHERE 
+        c.competition_id = $1
+        AND p._venue_id = $2
+)
+`
+
+type IsVenueValidForCompetitionParams struct {
+	CompetitionID int32
+	VenueID       int32
+}
+
+func (q *Queries) IsVenueValidForCompetition(ctx context.Context, arg IsVenueValidForCompetitionParams) (bool, error) {
+	row := q.db.QueryRow(ctx, isVenueValidForCompetition, arg.CompetitionID, arg.VenueID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
 }
 
 const listCompetitionsBySportID = `-- name: ListCompetitionsBySportID :many
@@ -145,7 +234,6 @@ const listEventsByFilter = `-- name: ListEventsByFilter :many
 SELECT 
     e.event_id, 
     e.start_time,
-    e.end_time,
     e.status,
     s.name AS sport_name,
     c.name AS competition_name 
@@ -154,7 +242,7 @@ JOIN competitions c ON c.competition_id = e._competition_id
 JOIN sports s ON s.sport_id = c._sport_id 
 WHERE 
     e.start_time >= $1
-    AND e.end_time <= $2
+    AND e.start_time <= $2
     AND c._sport_id = COALESCE($3, c._sport_id) 
     AND e._competition_id = COALESCE($4, e._competition_id) 
     AND $5::int[] IS NULL OR EXISTS 
@@ -174,7 +262,6 @@ type ListEventsByFilterParams struct {
 type ListEventsByFilterRow struct {
 	EventID         int32
 	StartTime       time.Time
-	EndTime         time.Time
 	Status          Status
 	SportName       string
 	CompetitionName string
@@ -198,7 +285,6 @@ func (q *Queries) ListEventsByFilter(ctx context.Context, arg ListEventsByFilter
 		if err := rows.Scan(
 			&i.EventID,
 			&i.StartTime,
-			&i.EndTime,
 			&i.Status,
 			&i.SportName,
 			&i.CompetitionName,

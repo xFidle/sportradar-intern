@@ -2,22 +2,55 @@ package service
 
 import (
 	"context"
+	"errors"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jinzhu/copier"
 	"github.com/xFidle/sportradar-intern/server/internal/models"
+	"github.com/xFidle/sportradar-intern/server/internal/repo"
 	"github.com/xFidle/sportradar-intern/server/internal/util"
+)
+
+var (
+	ErrInvalidVenue = errors.New("venue does not belong to competition")
+	ErrInvalidTeams = errors.New("one or more teams do not belong to competition")
 )
 
 type EventService struct {
 	loader *loader
+	db     *pgxpool.Pool
+	q      *repo.Queries
 }
 
 func NewEventService(db *pgxpool.Pool, fileserverAddr string) *EventService {
-	return &EventService{loader: newLoader(db, fileserverAddr)}
+	return &EventService{
+		loader: newLoader(db, fileserverAddr),
+		db:     db,
+		q:      repo.New(db),
+	}
 }
 
 func (s *EventService) CreateEvent(ctx context.Context, req models.CreateEventReq) (*models.DetailedEvent, error) {
+	isVenueCorrect, err := s.loader.checkVenueCorrectnes(ctx, req.CompetitionID, req.VenueID)
+	if err != nil {
+		return nil, err
+	}
 
+	if !isVenueCorrect {
+		return nil, ErrInvalidVenue
+	}
+
+	areTeamsCorrect, err := s.loader.checkTeamsCorrectness(ctx, req.CompetitionID, req.TeamIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	if !areTeamsCorrect {
+		return nil, ErrInvalidTeams
+	}
+
+	return s.insertEventTX(ctx, req)
 }
 
 func (s *EventService) GetEvent(ctx context.Context, id int32) (*models.DetailedEvent, error) {
@@ -83,4 +116,43 @@ func (s *EventService) GetEvents(ctx context.Context, filter models.Filter) ([]m
 	}
 
 	return events, nil
+}
+
+func (s *EventService) insertEventTX(ctx context.Context, req models.CreateEventReq) (*models.DetailedEvent, error) {
+	var eventParams repo.InsertEventParams
+	if err := copier.Copy(&eventParams, &req); err != nil {
+		return nil, err
+	}
+
+	startTime, _ := time.Parse(util.TimestampLayout, req.StartTime)
+	eventParams.StartTime = startTime
+	eventParams.Status = repo.StatusScheduled
+
+	tx, err := s.db.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+
+	qtx := s.q.WithTx(tx)
+
+	eventID, err := qtx.InsertEvent(ctx, eventParams)
+	if err != nil {
+		return nil, err
+	}
+
+	participantsParams := repo.InsertParticipantsParams{
+		EventID:  eventID,
+		TeamsIds: req.TeamIDs,
+	}
+
+	if err := qtx.InsertParticipants(ctx, participantsParams); err != nil {
+		return nil, err
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return nil, err
+	}
+
+	return s.GetEvent(ctx, eventID)
 }

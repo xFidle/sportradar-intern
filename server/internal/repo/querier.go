@@ -9,7 +9,11 @@ import (
 )
 
 type Querier interface {
+	CountValidTeamsForCompetition(ctx context.Context, arg CountValidTeamsForCompetitionParams) (int64, error)
 	GetDetailedEventByID(ctx context.Context, eventID int32) (GetDetailedEventByIDRow, error)
+	InsertEvent(ctx context.Context, arg InsertEventParams) (int32, error)
+	InsertParticipants(ctx context.Context, arg InsertParticipantsParams) error
+	IsVenueValidForCompetition(ctx context.Context, arg IsVenueValidForCompetitionParams) (bool, error)
 	ListCompetitionsBySportID(ctx context.Context, sportID int32) ([]ListCompetitionsBySportIDRow, error)
 	ListDetailedTeamsByEventID(ctx context.Context, eventID int32) ([]ListDetailedTeamsByEventIDRow, error)
 	ListEventsByFilter(ctx context.Context, arg ListEventsByFilterParams) ([]ListEventsByFilterRow, error)
