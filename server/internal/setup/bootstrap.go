@@ -25,12 +25,14 @@ type services struct {
 	event       *service.EventService
 	sport       *service.SportService
 	competition *service.CompetitionService
+	team        *service.TeamService
 }
 
 type transport struct {
 	event       *handlers.EventHandler
 	sport       *handlers.SportHandler
 	competition *handlers.CompetitionHandler
+	team        *handlers.TeamHandler
 }
 
 func newBootstrap() *bootstrap {
@@ -54,12 +56,14 @@ func (b *bootstrap) initServices() {
 	b.services.event = service.NewEventService(dbHandle, b.config.fileserverAddr)
 	b.services.sport = service.NewSportService(dbHandle)
 	b.services.competition = service.NewCompetitionService(dbHandle)
+	b.services.team = service.NewTeamService(dbHandle, b.config.fileserverAddr)
 }
 
 func (b *bootstrap) initTransport() {
 	b.transport.event = handlers.NewEventHandler(b.services.event)
 	b.transport.sport = handlers.NewSportHandler(b.services.sport)
 	b.transport.competition = handlers.NewCompetitionHandler(b.services.competition)
+	b.transport.team = handlers.NewTeamHandler(b.services.team)
 }
 
 func (b *bootstrap) close() {

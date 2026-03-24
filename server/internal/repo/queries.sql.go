@@ -322,6 +322,49 @@ func (q *Queries) ListSports(ctx context.Context) ([]Sport, error) {
 	return items, nil
 }
 
+const listTeamsByCompetitionID = `-- name: ListTeamsByCompetitionID :many
+SELECT 
+    t.team_id,
+    t.name,
+    t.abbreviation,
+    t.logo_path
+FROM teams t
+JOIN competition_teams ct ON t.team_id = ct._team_id
+WHERE ct._competition_id = $1
+`
+
+type ListTeamsByCompetitionIDRow struct {
+	TeamID       int32
+	Name         string
+	Abbreviation string
+	LogoPath     *string
+}
+
+func (q *Queries) ListTeamsByCompetitionID(ctx context.Context, competitionID int32) ([]ListTeamsByCompetitionIDRow, error) {
+	rows, err := q.db.Query(ctx, listTeamsByCompetitionID, competitionID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListTeamsByCompetitionIDRow
+	for rows.Next() {
+		var i ListTeamsByCompetitionIDRow
+		if err := rows.Scan(
+			&i.TeamID,
+			&i.Name,
+			&i.Abbreviation,
+			&i.LogoPath,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listTeamsByEventsIDs = `-- name: ListTeamsByEventsIDs :many
 SELECT 
     p._event_id,

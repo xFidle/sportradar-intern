@@ -28,7 +28,9 @@ func registerRoutes(t transport) http.Handler {
 		r.Post("/events", t.event.HandleGetEvents)
 
 		r.Get("/sports", t.sport.HandleGetSports)
-		r.Get("/competition/{sport_id}", t.competition.HandleGetCompetitions)
+		r.Get("/competitions", t.competition.HandleGetCompetitions)
+		r.Get("/teams", t.team.HandleGetTeamsByCompetition)
 	})
+
 	return r
 }

@@ -97,3 +97,14 @@ SELECT
     name
 FROM competitions c
 WHERE c._sport_id = sqlc.arg('sport_id');
+
+
+-- name: ListTeamsByCompetitionID :many
+SELECT 
+    t.team_id,
+    t.name,
+    t.abbreviation,
+    t.logo_path
+FROM teams t
+JOIN competition_teams ct ON t.team_id = ct._team_id
+WHERE ct._competition_id = sqlc.arg('competition_id');

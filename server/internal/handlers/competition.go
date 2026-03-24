@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/xFidle/sportradar-intern/server/internal/httpx"
 	"github.com/xFidle/sportradar-intern/server/internal/models"
 )
@@ -23,7 +22,7 @@ func NewCompetitionHandler(svc CompetitionService) *CompetitionHandler {
 }
 
 func (h *CompetitionHandler) HandleGetCompetitions(w http.ResponseWriter, r *http.Request) {
-	sportID, err := strconv.Atoi(chi.URLParam(r, "sport_id"))
+	sportID, err := strconv.Atoi(r.URL.Query().Get("sport_id"))
 	if err != nil {
 		logError(err, r)
 		httpx.WriteError(w, httpx.InvalidPathParameter)
