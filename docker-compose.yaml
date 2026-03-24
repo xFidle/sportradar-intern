@@ -28,11 +28,6 @@ services:
       - ./storage:/www:ro,z
     command: httpd -f -p 9000 -h /www
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- localhost:9000/init > /dev/null 2>&1"]
-      interval: 10s
-      timeout: 5s 
-      retries: 3
 
   server:
     container_name: sportradar-server
@@ -41,13 +36,19 @@ services:
     build:
       context: ./server
       dockerfile: dockerfile
-    env_file:
-      - ./server/.env
+    environment:
+      - PORT=8080
+      - FILESERVER_ADDR=http://localhost:9000
+      - DB_HOST=database
+      - DB_PORT=5432
+      - DB_USER=user
+      - DB_PASSWORD=password
+      - DB_NAME=dev
     depends_on:
       database:
         condition: service_healthy
       fileserver:
-        condition: service_healthy
+        condition: service_started
     restart: unless-stopped
 
 volumes:
