@@ -1,7 +1,6 @@
 package httpx
 
 import (
-	"log"
 	"net/http"
 )
 
@@ -28,8 +27,4 @@ type HError struct {
 
 func (h *HError) Error() string {
 	return h.Message
-}
-
-func LogError(err error, r *http.Request) {
-	log.Printf("%v: %v", r.URL.Path, err)
 }
