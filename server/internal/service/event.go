@@ -1,4 +1,4 @@
-package event
+package service
 
 import (
 	"context"
@@ -8,15 +8,15 @@ import (
 	"github.com/xFidle/sportradar-intern/server/internal/util"
 )
 
-type Service struct {
+type EventService struct {
 	loader *loader
 }
 
-func New(db *pgxpool.Pool, fileserverAddr string) *Service {
-	return &Service{loader: newLoader(db, fileserverAddr)}
+func NewEventService(db *pgxpool.Pool, fileserverAddr string) *EventService {
+	return &EventService{loader: newLoader(db, fileserverAddr)}
 }
 
-func (s *Service) GetEvent(ctx context.Context, id int32) (*models.DetailedEvent, error) {
+func (s *EventService) GetEvent(ctx context.Context, id int32) (*models.DetailedEvent, error) {
 	event, err := s.loader.fetchEventByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func (s *Service) GetEvent(ctx context.Context, id int32) (*models.DetailedEvent
 	return event, nil
 }
 
-func (s *Service) GetEvents(ctx context.Context, filter models.Filter) ([]models.Event, error) {
+func (s *EventService) GetEvents(ctx context.Context, filter models.Filter) ([]models.Event, error) {
 	events, err := s.loader.fetchEventsByFilter(ctx, filter)
 	if err != nil {
 		return nil, err

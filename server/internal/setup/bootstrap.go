@@ -5,9 +5,8 @@ import (
 	"log"
 
 	"github.com/xFidle/sportradar-intern/server/internal/db"
-	"github.com/xFidle/sportradar-intern/server/internal/event"
 	"github.com/xFidle/sportradar-intern/server/internal/handlers"
-	"github.com/xFidle/sportradar-intern/server/internal/sport"
+	"github.com/xFidle/sportradar-intern/server/internal/service"
 )
 
 type bootstrap struct {
@@ -23,8 +22,8 @@ type storage struct {
 }
 
 type services struct {
-	event *event.Service
-	sport *sport.Service
+	event *service.EventService
+	sport *service.SportService
 }
 
 type transport struct {
@@ -50,8 +49,8 @@ func (b *bootstrap) initStorage() {
 
 func (b *bootstrap) initServices() {
 	dbHandle := b.db.Handle()
-	b.services.event = event.New(dbHandle, b.config.fileserverAddr)
-	b.services.sport = sport.New(dbHandle)
+	b.services.event = service.NewEventService(dbHandle, b.config.fileserverAddr)
+	b.services.sport = service.NewSportService(dbHandle)
 }
 
 func (b *bootstrap) initTransport() {

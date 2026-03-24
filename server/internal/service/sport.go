@@ -1,4 +1,4 @@
-package sport
+package service
 
 import (
 	"context"
@@ -9,16 +9,16 @@ import (
 	"github.com/xFidle/sportradar-intern/server/internal/repo"
 )
 
-type Service struct {
+type SportService struct {
 	db *pgxpool.Pool
 	q  *repo.Queries
 }
 
-func New(db *pgxpool.Pool) *Service {
-	return &Service{db: db, q: repo.New(db)}
+func NewSportService(db *pgxpool.Pool) *SportService {
+	return &SportService{db: db, q: repo.New(db)}
 }
 
-func (s *Service) GetSports(ctx context.Context) ([]models.Sport, error) {
+func (s *SportService) GetSports(ctx context.Context) ([]models.Sport, error) {
 	rows, err := s.q.ListSports(ctx)
 	if err != nil {
 		return nil, err
