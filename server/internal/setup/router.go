@@ -24,10 +24,11 @@ func registerRoutes(t transport) http.Handler {
 	}))
 
 	r.Route("/api", func(r chi.Router) {
-		r.Get("/event", t.event.HandleGetEvent)
+		r.Get("/event/{event_id}", t.event.HandleGetEvent)
 		r.Post("/events", t.event.HandleGetEvents)
 
 		r.Get("/sports", t.sport.HandleGetSports)
+		r.Get("/competition/{sport_id}", t.competition.HandleGetCompetitions)
 	})
 	return r
 }

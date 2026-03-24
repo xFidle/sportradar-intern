@@ -10,6 +10,7 @@ import (
 
 type Querier interface {
 	GetDetailedEventByID(ctx context.Context, eventID int32) (GetDetailedEventByIDRow, error)
+	ListCompetitionsBySportID(ctx context.Context, sportID int32) ([]ListCompetitionsBySportIDRow, error)
 	ListDetailedTeamsByEventID(ctx context.Context, eventID int32) ([]ListDetailedTeamsByEventIDRow, error)
 	ListEventsByFilter(ctx context.Context, arg ListEventsByFilterParams) ([]ListEventsByFilterRow, error)
 	ListPlayersByTeamIDs(ctx context.Context, teamIds []int32) ([]ListPlayersByTeamIDsRow, error)

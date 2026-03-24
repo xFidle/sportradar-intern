@@ -5,6 +5,10 @@ import (
 )
 
 var (
+	InvalidPathParameter = HError{
+		Code:    http.StatusBadRequest,
+		Message: "invalid path parameter",
+	}
 	InvalidPayloadError = HError{
 		Code:    http.StatusBadRequest,
 		Message: "invalid payload format",

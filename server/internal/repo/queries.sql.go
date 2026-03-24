@@ -51,6 +51,39 @@ func (q *Queries) GetDetailedEventByID(ctx context.Context, eventID int32) (GetD
 	return i, err
 }
 
+const listCompetitionsBySportID = `-- name: ListCompetitionsBySportID :many
+SELECT 
+    competition_id,
+    name
+FROM competitions c
+WHERE c._sport_id = $1
+`
+
+type ListCompetitionsBySportIDRow struct {
+	CompetitionID int32
+	Name          string
+}
+
+func (q *Queries) ListCompetitionsBySportID(ctx context.Context, sportID int32) ([]ListCompetitionsBySportIDRow, error) {
+	rows, err := q.db.Query(ctx, listCompetitionsBySportID, sportID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListCompetitionsBySportIDRow
+	for rows.Next() {
+		var i ListCompetitionsBySportIDRow
+		if err := rows.Scan(&i.CompetitionID, &i.Name); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listDetailedTeamsByEventID = `-- name: ListDetailedTeamsByEventID :many
 SELECT 
     p._event_id,

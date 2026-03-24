@@ -90,3 +90,10 @@ WHERE p._event_id = sqlc.arg('event_id');
 
 -- name: ListSports :many
 SELECT * FROM sports;
+
+-- name: ListCompetitionsBySportID :many
+SELECT 
+    competition_id,
+    name
+FROM competitions c
+WHERE c._sport_id = sqlc.arg('sport_id');

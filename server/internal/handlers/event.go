@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/xFidle/sportradar-intern/server/internal/httpx"
 	"github.com/xFidle/sportradar-intern/server/internal/models"
 	"github.com/xFidle/sportradar-intern/server/internal/util"
@@ -26,10 +27,10 @@ func NewEventHandler(svc EventService) *EventHandler {
 }
 
 func (h *EventHandler) HandleGetEvent(w http.ResponseWriter, r *http.Request) {
-	eventID, err := strconv.Atoi(r.URL.Query().Get("event_id"))
+	eventID, err := strconv.Atoi(chi.URLParam(r, "event_id"))
 	if err != nil {
 		logError(err, r)
-		httpx.WriteError(w, httpx.InvalidPayloadError)
+		httpx.WriteError(w, httpx.InvalidPathParameter)
 		return
 	}
 
