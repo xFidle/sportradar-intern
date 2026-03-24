@@ -634,11 +634,11 @@ INSERT INTO stages (name, round_order) VALUES
 ('final', 7);
 
 INSERT INTO events (_competition_id, _venue_id, _stage_id, status, start_time, end_time) VALUES
-(1, 1, 1, 'scheduled', now() + interval '7 days', now() + interval '7 days 2 hours'),
-(1, 3, 1, 'scheduled', now() + interval '9 days', now() + interval '9 days 2 hours'),
-(2, 11, 1, 'scheduled', now() + interval '5 days', now() + interval '5 days 2 hours'),
-(3, 21, 1, 'scheduled', now() + interval '6 days', now() + interval '6 days 2 hours'),
-(4, 27, 1, 'scheduled', now() + interval '8 days', now() + interval '8 days 3 hours');
+(1, 1, 1, 'scheduled', now() + interval '7 days', NULL),
+(1, 3, 1, 'scheduled', now() + interval '9 days', NULL),
+(2, 11, 1, 'scheduled', now() + interval '5 days', NULL),
+(3, 21, 1, 'scheduled', now() + interval '6 days', NULL),
+(4, 27, 1, 'scheduled', now() + interval '8 days', NULL);
 
 INSERT INTO participants (_event_id, _team_id) VALUES
 (1, 1),

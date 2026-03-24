@@ -96,7 +96,7 @@ CREATE TABLE events (
     _stage_id INTEGER NOT NULL,
     status STATUS NOT NULL,
     start_time TIMESTAMPTZ NOT NULL,
-    end_time TIMESTAMPTZ NOT NULL,
+    end_time TIMESTAMPTZ,
     CONSTRAINT fk_events_competition FOREIGN KEY (_competition_id) REFERENCES competitions(competition_id) ON DELETE CASCADE,
     CONSTRAINT fk_events_venue FOREIGN KEY (_venue_id) REFERENCES venues(venue_id) ON DELETE RESTRICT,
     CONSTRAINT fk_events_stage FOREIGN KEY (_stage_id) REFERENCES stages(stage_id) ON DELETE RESTRICT,
