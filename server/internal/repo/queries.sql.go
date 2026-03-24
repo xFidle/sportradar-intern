@@ -265,6 +265,30 @@ func (q *Queries) ListScoresByEventID(ctx context.Context, eventID int32) ([]Lis
 	return items, nil
 }
 
+const listSports = `-- name: ListSports :many
+SELECT sport_id, name FROM sports
+`
+
+func (q *Queries) ListSports(ctx context.Context) ([]Sport, error) {
+	rows, err := q.db.Query(ctx, listSports)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Sport
+	for rows.Next() {
+		var i Sport
+		if err := rows.Scan(&i.SportID, &i.Name); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listTeamsByEventsIDs = `-- name: ListTeamsByEventsIDs :many
 SELECT 
     p._event_id,
