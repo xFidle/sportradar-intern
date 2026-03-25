@@ -146,7 +146,9 @@ func (q *Queries) IsVenueValidForCompetition(ctx context.Context, arg IsVenueVal
 const listCompetitionsBySportID = `-- name: ListCompetitionsBySportID :many
 SELECT 
     c.competition_id,
-    c.name
+    c.name,
+    c.type,
+    c.logo_path
 FROM competitions c
 WHERE c._sport_id = $1
 `
@@ -154,6 +156,8 @@ WHERE c._sport_id = $1
 type ListCompetitionsBySportIDRow struct {
 	CompetitionID int32
 	Name          string
+	Type          CompetitionType
+	LogoPath      *string
 }
 
 func (q *Queries) ListCompetitionsBySportID(ctx context.Context, sportID int32) ([]ListCompetitionsBySportIDRow, error) {
@@ -165,7 +169,12 @@ func (q *Queries) ListCompetitionsBySportID(ctx context.Context, sportID int32) 
 	var items []ListCompetitionsBySportIDRow
 	for rows.Next() {
 		var i ListCompetitionsBySportIDRow
-		if err := rows.Scan(&i.CompetitionID, &i.Name); err != nil {
+		if err := rows.Scan(
+			&i.CompetitionID,
+			&i.Name,
+			&i.Type,
+			&i.LogoPath,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -248,19 +257,17 @@ WHERE
     e.start_time >= $1
     AND e.start_time <= $2
     AND c._sport_id = COALESCE($3, c._sport_id) 
-    AND e._competition_id = COALESCE($4, e._competition_id) 
-    AND $5::int[] IS NULL OR EXISTS 
+    AND $4::int[] IS NULL OR EXISTS 
       (SELECT 1 FROM participants p
       WHERE p._event_id = e.event_id
-        AND p._team_id = ANY($5::int[]))
+        AND p._team_id = ANY($4::int[]))
 `
 
 type ListEventsByFilterParams struct {
-	StartAfter    time.Time
-	EndBefore     time.Time
-	SportID       *int32
-	CompetitionID *int32
-	TeamIds       []int32
+	StartAfter time.Time
+	EndBefore  time.Time
+	SportID    *int32
+	TeamIds    []int32
 }
 
 type ListEventsByFilterRow struct {
@@ -277,7 +284,6 @@ func (q *Queries) ListEventsByFilter(ctx context.Context, arg ListEventsByFilter
 		arg.StartAfter,
 		arg.EndBefore,
 		arg.SportID,
-		arg.CompetitionID,
 		arg.TeamIds,
 	)
 	if err != nil {

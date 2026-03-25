@@ -158,6 +158,7 @@ type Competition struct {
 	SportID       int32
 	Type          CompetitionType
 	Name          string
+	LogoPath      *string
 }
 
 type CompetitionTeam struct {

@@ -56,7 +56,7 @@ func (b *bootstrap) initServices() {
 	dbHandle := b.db.Handle()
 	b.services.event = service.NewEventService(dbHandle, b.config.fileserverAddr)
 	b.services.sport = service.NewSportService(dbHandle)
-	b.services.competition = service.NewCompetitionService(dbHandle)
+	b.services.competition = service.NewCompetitionService(dbHandle, b.config.fileserverAddr)
 	b.services.team = service.NewTeamService(dbHandle, b.config.fileserverAddr)
 	b.services.venue = service.NewVenueService(dbHandle)
 }

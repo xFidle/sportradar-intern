@@ -10,6 +10,7 @@ CREATE TABLE competitions (
     _sport_id INT NOT NULL,
     type COMPETITION_TYPE NOT NULL,
     name VARCHAR(256) NOT NULL,
+    logo_path VARCHAR(256),
     CONSTRAINT fk_competitions_sport FOREIGN KEY (_sport_id) REFERENCES sports(sport_id) ON DELETE CASCADE
 );
 

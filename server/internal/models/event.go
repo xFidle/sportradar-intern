@@ -10,15 +10,6 @@ const (
 	Scheduled  Status = "scheduled"
 )
 
-type CompetitionType string
-
-const (
-	Tournament CompetitionType = "tournament"
-	League     CompetitionType = "league"
-	Friendly   CompetitionType = "friendly"
-	Other      CompetitionType = "other"
-)
-
 type baseEvent struct {
 	EventID         int32           `json:"event_id"`
 	StartTime       time.Time       `json:"start_time"`

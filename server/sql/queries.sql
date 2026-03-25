@@ -88,7 +88,6 @@ WHERE
     e.start_time >= sqlc.arg('start_after')
     AND e.start_time <= sqlc.arg('end_before')
     AND c._sport_id = COALESCE(sqlc.narg('sport_id'), c._sport_id) 
-    AND e._competition_id = COALESCE(sqlc.narg('competition_id'), e._competition_id) 
     AND sqlc.narg('team_ids')::int[] IS NULL OR EXISTS 
       (SELECT 1 FROM participants p
       WHERE p._event_id = e.event_id
@@ -123,7 +122,9 @@ SELECT * FROM sports;
 -- name: ListCompetitionsBySportID :many
 SELECT 
     c.competition_id,
-    c.name
+    c.name,
+    c.type,
+    c.logo_path
 FROM competitions c
 WHERE c._sport_id = sqlc.arg('sport_id');
 

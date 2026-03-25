@@ -4,11 +4,11 @@ INSERT INTO sports (name) VALUES
 ('basketball'),
 ('american football');
 
-INSERT INTO competitions (_sport_id, type, name) VALUES
-(1, 'tournament', 'UEFA Champions League'),
-(2, 'league', 'NHL'),
-(3, 'league', 'NBA'),
-(4, 'league', 'NFL');
+INSERT INTO competitions (_sport_id, type, name, logo_path) VALUES
+(1, 'tournament', 'UEFA Champions League', 'competitions/uefa_champions_league.png'),
+(2, 'league', 'NHL', 'competitions/nhl.png'),
+(3, 'league', 'NBA', 'competitions/nba.png'),
+(4, 'league', 'NFL', 'competitions/nfl.png');
 
 INSERT INTO countries (name, code) VALUES
 ('Argentina', 'AR'),

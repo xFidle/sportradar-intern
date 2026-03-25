@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jinzhu/copier"
@@ -10,12 +11,17 @@ import (
 )
 
 type CompetitionService struct {
-	db *pgxpool.Pool
-	q  *repo.Queries
+	fAddr string
+	db    *pgxpool.Pool
+	q     *repo.Queries
 }
 
-func NewCompetitionService(db *pgxpool.Pool) *CompetitionService {
-	return &CompetitionService{db: db, q: repo.New(db)}
+func NewCompetitionService(db *pgxpool.Pool, fileserverAddr string) *CompetitionService {
+	return &CompetitionService{
+		fAddr: fileserverAddr,
+		db:    db,
+		q:     repo.New(db),
+	}
 }
 
 func (s *CompetitionService) GetCompetitionsBySportID(ctx context.Context, id int32) ([]models.Competition, error) {
@@ -27,6 +33,10 @@ func (s *CompetitionService) GetCompetitionsBySportID(ctx context.Context, id in
 	var competitions []models.Competition
 	if err := copier.Copy(&competitions, &rows); err != nil {
 		return nil, err
+	}
+
+	for i := range competitions {
+		competitions[i].LogoPath = fmt.Sprintf("%s/%s", s.fAddr, competitions[i].LogoPath)
 	}
 
 	return competitions, nil
