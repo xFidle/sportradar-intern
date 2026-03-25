@@ -2,6 +2,7 @@ export const dom = {
   startAfter: document.getElementById("startAfter"),
   endBefore: document.getElementById("endBefore"),
   sportFilterChips: document.getElementById("sportFilterChips"),
+  statusFilterChips: document.getElementById("statusFilterChips"),
   teamFilterList: document.getElementById("teamFilterList"),
   loadEventsBtn: document.getElementById("loadEventsBtn"),
   clearFiltersBtn: document.getElementById("clearFiltersBtn"),
@@ -17,7 +18,6 @@ export const dom = {
   venueCreate: document.getElementById("venueCreate"),
   teamOne: document.getElementById("teamOne"),
   teamTwo: document.getElementById("teamTwo"),
-  stageId: document.getElementById("stageId"),
   startTimeCreate: document.getElementById("startTimeCreate"),
   createEventBtn: document.getElementById("createEventBtn"),
   createMsg: document.getElementById("createMsg")

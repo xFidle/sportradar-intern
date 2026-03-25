@@ -2,6 +2,7 @@ export const state = {
   sports: [],
   filter: {
     sportID: null,
+    status: null,
     teamIDs: []
   },
   filterOptions: {

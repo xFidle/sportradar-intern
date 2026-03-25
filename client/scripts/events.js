@@ -35,6 +35,10 @@ async function loadEvents() {
     payload.sport_id = state.filter.sportID
   }
 
+  if (state.filter.status !== null) {
+    payload.status = state.filter.status
+  }
+
   if (state.filter.teamIDs.length > 0) {
     payload.team_ids = state.filter.teamIDs
   }
@@ -49,6 +53,38 @@ async function loadEvents() {
 
 // FILTERING
 
+const statusOptions = [
+  { value: null, label: "All" },
+  { value: "scheduled", label: "Scheduled" },
+  { value: "finished", label: "Finished" }
+]
+
+function setDefaultFilterDates() {
+  const start = new Date("2026-01-01")
+  const finish = new Date("2027-01-01")
+
+  dom.startAfter.value = start.toISOString().slice(0, 10)
+  dom.endBefore.value = finish.toISOString().slice(0, 10)
+}
+
+function renderStatusFilter() {
+  dom.statusFilterChips.innerHTML = ""
+
+  statusOptions.forEach((option) => {
+    const btn = document.createElement("button")
+    btn.type = "button"
+    btn.className = `chip${state.filter.status === option.value ? " active" : ""}`
+    btn.textContent = option.label
+    btn.addEventListener("click", () => onFilterStatusSelect(option.value))
+    dom.statusFilterChips.appendChild(btn)
+  })
+}
+
+function onFilterStatusSelect(status) {
+  state.filter.status = status
+  renderStatusFilter()
+}
+
 function renderFilterSections() {
   renderSportChips({
     target: dom.sportFilterChips,
@@ -57,6 +93,8 @@ function renderFilterSections() {
     includeAll: true,
     onSelect: onFilterSportSelect
   })
+
+  renderStatusFilter()
 
   renderTeamFilter({
     target: dom.teamFilterList,
@@ -79,6 +117,7 @@ async function onFilterSportSelect(sportID) {
   state.filterOptions.teams = []
 
   if (sportID === null) {
+    renderFilterSections()
     return
   }
 
@@ -88,7 +127,9 @@ async function onFilterSportSelect(sportID) {
 }
 
 function clearFilters() {
+  setDefaultFilterDates()
   state.filter.sportID = null
+  state.filter.status = null
   state.filter.teamIDs = []
   state.filterOptions.teams = []
   renderFilterSections()
@@ -96,6 +137,7 @@ function clearFilters() {
 
 // CREATE FORM
 
+const DEFAULT_STAGE_ID = 1
 const teamNameLabel = (team) => (team.abbreviation ? `${team.name} (${team.abbreviation})` : team.name)
 
 function clearCreateSelects({ competition, venue, teams }) {
@@ -240,12 +282,11 @@ function localDateTimeToRFC3339(localValue) {
 async function createEvent() {
   const competitionID = Number(dom.competitionCreate.value)
   const venueID = Number(dom.venueCreate.value)
-  const stageID = Number(dom.stageId.value)
   const team1 = Number(dom.teamOne.value)
   const team2 = Number(dom.teamTwo.value)
 
-  if (!competitionID || !venueID || !stageID) {
-    throw new Error("Competition, venue and stage are required.")
+  if (!competitionID || !venueID) {
+    throw new Error("Competition and venue are required.")
   }
   if (!team1 || !team2) {
     throw new Error("Please select Team 1 and Team 2.")
@@ -266,7 +307,7 @@ async function createEvent() {
       body: JSON.stringify({
         competition_id: competitionID,
         venue_id: venueID,
-        stage_id: stageID,
+        stage_id: DEFAULT_STAGE_ID,
         start_time: startTime,
         team_ids: [team1, team2]
       })
@@ -285,13 +326,8 @@ async function createEvent() {
 }
 
 function setupDefaults() {
+  setDefaultFilterDates()
   const now = new Date()
-  const in30Days = new Date(now)
-  in30Days.setDate(now.getDate() + 30)
-
-  dom.startAfter.value = now.toISOString().slice(0, 10)
-  dom.endBefore.value = in30Days.toISOString().slice(0, 10)
-
   const in1h = new Date(now.getTime() + 60 * 60 * 1000)
   const yyyy = in1h.getFullYear()
   const mm = String(in1h.getMonth() + 1).padStart(2, "0")

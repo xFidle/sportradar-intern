@@ -195,15 +195,41 @@ body {
 }
 
 .badge.status-finished {
-  border-color: rgba(95, 111, 118, 0.35);
-  background: rgba(95, 111, 118, 0.12);
-  color: #49575d;
+  border-color: rgba(180, 35, 24, 0.34);
+  background: rgba(180, 35, 24, 0.1);
+  color: #8f1f14;
 }
 
 .event-card h4 {
   margin: 0.2rem 0;
   font-size: 1rem;
   font-family: "Space Grotesk", sans-serif;
+}
+
+.competition-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.competition-row h4 {
+  margin: 0.2rem 0;
+}
+
+.competition-logo {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  object-fit: cover;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 0.62rem;
+  font-weight: 700;
+  flex-shrink: 0;
 }
 
 .event-card p {
@@ -228,13 +254,20 @@ body {
   max-width: fit-content;
 }
 
+.participant-score {
+  margin-left: 0.3rem;
+  min-width: 1.2rem;
+  text-align: right;
+  font-weight: 700;
+  color: var(--text);
+}
+
 .logo {
   width: 24px;
   height: 24px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
+  border-radius: 6px;
   object-fit: cover;
-  background: #fff;
+  background: transparent;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -297,6 +330,11 @@ body {
   gap: 0.42rem;
 }
 
+#teamFilterList {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
 .chip,
 .check-item {
   border: 1px solid var(--border);
@@ -326,6 +364,26 @@ body {
   align-items: center;
   gap: 0.36rem;
   padding: 0.32rem 0.58rem;
+}
+
+.option-logo {
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  object-fit: cover;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 0.62rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.option-text {
+  line-height: 1.1;
 }
 
 .check-item input {
