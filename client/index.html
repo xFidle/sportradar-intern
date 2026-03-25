@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sports Events Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <h1 class="brand">Sports Events Dashboard</h1>
+    </div>
+  </header>
+
+  <main class="app">
+    <div class="layout">
+      <section class="panel">
+        <div class="events-header">
+          <h2>Upcoming Events</h2>
+          <p id="eventsCount">0 events</p>
+        </div>
+        <div id="eventsList" class="events-grid"></div>
+      </section>
+
+      <aside class="sidebar">
+        <button id="openCreateModalBtn" class="fab add-event-btn" type="button">
+          <span class="plus">+</span>
+          Add Event
+        </button>
+
+        <section class="panel">
+          <h3>Filters</h3>
+
+          <div class="field">
+            <label for="startAfter">Start after</label>
+            <input id="startAfter" type="date" />
+          </div>
+          <div class="field">
+            <label for="endBefore">End before</label>
+            <input id="endBefore" type="date" />
+          </div>
+
+          <div class="selector-group">
+            <p class="selector-label">Sport</p>
+            <div id="sportFilterChips" class="chips"></div>
+          </div>
+
+          <div class="selector-group">
+            <p class="selector-label">Teams (checkbox)</p>
+            <div id="teamFilterList" class="option-list"></div>
+          </div>
+
+          <div class="button-row">
+            <button id="loadEventsBtn" type="button">Load Events</button>
+            <button id="clearFiltersBtn" class="alt" type="button">Clear</button>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <div id="createModal" class="modal" aria-hidden="true">
+    <div id="createModalBackdrop" class="modal-backdrop"></div>
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="createModalTitle">
+      <div class="modal-header">
+        <h3 id="createModalTitle">Add Event</h3>
+        <button id="closeCreateModalBtn" class="close-btn" type="button" aria-label="Close">x</button>
+      </div>
+
+      <div class="form-grid">
+        <div class="field span-6">
+          <label for="sportCreate">Sport</label>
+          <select id="sportCreate">
+            <option value="">Select sport</option>
+          </select>
+        </div>
+
+        <div class="field span-6">
+          <label for="competitionCreate">Competition</label>
+          <select id="competitionCreate" disabled>
+            <option value="">Select competition</option>
+          </select>
+        </div>
+
+        <div class="field span-6">
+          <label for="venueCreate">Venue</label>
+          <select id="venueCreate" disabled>
+            <option value="">Select venue</option>
+          </select>
+        </div>
+
+        <div class="field span-6">
+          <label for="startTimeCreate">Start time (local)</label>
+          <input id="startTimeCreate" type="datetime-local" step="60" />
+          <p class="hint">Sent as RFC3339 to backend.</p>
+        </div>
+
+        <div class="field span-6">
+          <label for="teamOne">Team 1</label>
+          <select id="teamOne" disabled>
+            <option value="">Select team</option>
+          </select>
+        </div>
+
+        <div class="field span-6">
+          <label for="teamTwo">Team 2</label>
+          <select id="teamTwo" disabled>
+            <option value="">Select team</option>
+          </select>
+        </div>
+
+        <div class="field span-4">
+          <label for="stageId">Stage ID</label>
+          <input id="stageId" type="number" min="1" value="1" />
+        </div>
+
+        <div class="span-12 button-row">
+          <button id="createEventBtn" type="button">Create Event</button>
+          <button id="cancelCreateBtn" class="alt" type="button">Cancel</button>
+        </div>
+      </div>
+
+      <div id="createMsg" class="message" aria-live="polite"></div>
+    </section>
+  </div>
+
+  <script type="module" src="./events.js"></script>
+</body>
+
+</html>
