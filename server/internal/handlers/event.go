@@ -118,7 +118,8 @@ func (h *EventHandler) HandleGetEvents(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, err := time.Parse(util.DateLayout, filter.StartAfter); err != nil {
+	start, err := time.Parse(util.DateLayout, filter.StartAfter)
+	if err != nil {
 		logError(err, r)
 		hErr := httpx.InvalidPayloadError
 		hErr.Details = fmt.Sprintf(util.ParsingDateMessage, filter.StartAfter)
@@ -126,10 +127,18 @@ func (h *EventHandler) HandleGetEvents(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, err := time.Parse(util.DateLayout, filter.EndBefore); err != nil {
+	end, err := time.Parse(util.DateLayout, filter.EndBefore)
+	if err != nil {
 		logError(err, r)
 		hErr := httpx.InvalidPayloadError
 		hErr.Details = fmt.Sprintf(util.ParsingDateMessage, filter.EndBefore)
+		httpx.WriteError(w, hErr)
+		return
+	}
+
+	if start.After(end) {
+		hErr := httpx.InvalidPayloadError
+		hErr.Details = "'start_after' must be lower than 'end_before'"
 		httpx.WriteError(w, hErr)
 		return
 	}
