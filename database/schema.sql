@@ -55,7 +55,6 @@ CREATE TABLE players (
     shirt_number INTEGER NOT NULL,
     birth_date DATE NOT NULL,
     height INTEGER  NOT NULL,
-    photo_path VARCHAR(256),
     CONSTRAINT fk_players_team FOREIGN KEY (_team_id) REFERENCES teams(team_id) ON DELETE RESTRICT,
     CONSTRAINT fk_players_country FOREIGN KEY (_country_id) REFERENCES countries(country_id) ON DELETE SET NULL,
     CHECK (shirt_number > 0 AND shirt_number < 100),
