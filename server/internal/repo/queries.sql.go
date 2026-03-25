@@ -249,7 +249,8 @@ SELECT
     e.status,
     s.name AS sport_name,
     c.name AS competition_name,
-    c.type AS competition_type
+    c.type AS competition_type,
+    c.logo_path AS competition_logo
 FROM events e 
 JOIN competitions c ON c.competition_id = e._competition_id
 JOIN sports s ON s.sport_id = c._sport_id 
@@ -279,6 +280,7 @@ type ListEventsByFilterRow struct {
 	SportName       string
 	CompetitionName string
 	CompetitionType CompetitionType
+	CompetitionLogo *string
 }
 
 func (q *Queries) ListEventsByFilter(ctx context.Context, arg ListEventsByFilterParams) ([]ListEventsByFilterRow, error) {
@@ -303,6 +305,7 @@ func (q *Queries) ListEventsByFilter(ctx context.Context, arg ListEventsByFilter
 			&i.SportName,
 			&i.CompetitionName,
 			&i.CompetitionType,
+			&i.CompetitionLogo,
 		); err != nil {
 			return nil, err
 		}
@@ -534,6 +537,48 @@ func (q *Queries) ListTeamsByEventsIDs(ctx context.Context, eventIds []int32) ([
 		var i ListTeamsByEventsIDsRow
 		if err := rows.Scan(
 			&i.EventID,
+			&i.TeamID,
+			&i.Name,
+			&i.Abbreviation,
+			&i.LogoPath,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listTeamsBySportID = `-- name: ListTeamsBySportID :many
+SELECT 
+    t.team_id,
+    t.name,
+    t.abbreviation,
+    t.logo_path
+FROM teams t
+WHERE t._sport_id = $1
+`
+
+type ListTeamsBySportIDRow struct {
+	TeamID       int32
+	Name         string
+	Abbreviation string
+	LogoPath     *string
+}
+
+func (q *Queries) ListTeamsBySportID(ctx context.Context, sportID int32) ([]ListTeamsBySportIDRow, error) {
+	rows, err := q.db.Query(ctx, listTeamsBySportID, sportID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListTeamsBySportIDRow
+	for rows.Next() {
+		var i ListTeamsBySportIDRow
+		if err := rows.Scan(
 			&i.TeamID,
 			&i.Name,
 			&i.Abbreviation,

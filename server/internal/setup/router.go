@@ -33,6 +33,7 @@ func registerRoutes(t transport) http.Handler {
 		r.Route("/sports", func(r chi.Router) {
 			r.Get("/", t.sport.HandleGetSports)
 			r.Get("/{sport_id}/competitions", t.eventOptions.HandleGetCompetitionsBySport)
+			r.Get("/{sport_id}/teams", t.team.HandleGetTeamsBySport)
 			r.Get("/{sport_id}/event-options", t.eventOptions.HandleGetEventOptionsBySport)
 		})
 
