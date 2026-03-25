@@ -634,11 +634,16 @@ INSERT INTO stages (name, round_order) VALUES
 ('final', 7);
 
 INSERT INTO events (_competition_id, _venue_id, _stage_id, status, start_time, end_time) VALUES
-(1, 1, 1, 'scheduled', now() + interval '7 days', NULL),
-(1, 3, 1, 'scheduled', now() + interval '9 days', NULL),
-(2, 11, 1, 'scheduled', now() + interval '5 days', NULL),
-(3, 21, 1, 'scheduled', now() + interval '6 days', NULL),
-(4, 27, 1, 'scheduled', now() + interval '8 days', NULL);
+(1, 1, 1, 'scheduled', date_trunc('week', now()) + interval '2 days 19 hours', NULL),
+(1, 3, 1, 'scheduled', date_trunc('week', now()) + interval '3 days 20 hours', NULL),
+(2, 11, 1, 'scheduled', date_trunc('week', now()) + interval '5 days 18 hours', NULL),
+(3, 21, 1, 'scheduled', date_trunc('week', now()) + interval '6 days 15 hours', NULL),
+(4, 27, 1, 'scheduled', date_trunc('week', now()) + interval '7 days 20 hours', NULL),
+(1, 5, 1, 'finished', date_trunc('week', now()) - interval '26 days 20 hours', NULL),
+(2, 13, 1, 'finished', date_trunc('week', now()) - interval '19 days 19 hours', NULL),
+(3, 21, 1, 'finished', date_trunc('week', now()) - interval '13 days 21 hours', NULL),
+(4, 31, 1, 'finished', date_trunc('week', now()) - interval '8 days 18 hours', NULL),
+(1, 1, 1, 'finished', date_trunc('week', now()) - interval '3 days 20 hours', NULL);
 
 INSERT INTO participants (_event_id, _team_id) VALUES
 (1, 1),
@@ -651,13 +656,6 @@ INSERT INTO participants (_event_id, _team_id) VALUES
 (4, 21),
 (5, 31),
 (5, 32);
-
-INSERT INTO events (_competition_id, _venue_id, _stage_id, status, start_time, end_time) VALUES
-(1, 5, 1, 'finished', now() - interval '30 days', now() - interval '30 days' + interval '2 hours'),
-(2, 13, 1, 'finished', now() - interval '21 days', now() - interval '21 days' + interval '2 hours 30 minutes'),
-(3, 21, 1, 'finished', now() - interval '14 days', now() - interval '14 days' + interval '2 hours 15 minutes'),
-(4, 31, 1, 'finished', now() - interval '10 days', now() - interval '10 days' + interval '3 hours 20 minutes'),
-(1, 1, 1, 'finished', now() - interval '5 days', now() - interval '5 days' + interval '2 hours');
 
 INSERT INTO participants (_event_id, _team_id) VALUES
 (6, 5),
