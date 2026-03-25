@@ -651,3 +651,54 @@ INSERT INTO participants (_event_id, _team_id) VALUES
 (4, 21),
 (5, 31),
 (5, 32);
+
+INSERT INTO events (_competition_id, _venue_id, _stage_id, status, start_time, end_time) VALUES
+(1, 5, 1, 'finished', now() - interval '30 days', now() - interval '30 days' + interval '2 hours'),
+(2, 13, 1, 'finished', now() - interval '21 days', now() - interval '21 days' + interval '2 hours 30 minutes'),
+(3, 21, 1, 'finished', now() - interval '14 days', now() - interval '14 days' + interval '2 hours 15 minutes'),
+(4, 31, 1, 'finished', now() - interval '10 days', now() - interval '10 days' + interval '3 hours 20 minutes'),
+(1, 1, 1, 'finished', now() - interval '5 days', now() - interval '5 days' + interval '2 hours');
+
+INSERT INTO participants (_event_id, _team_id) VALUES
+(6, 5),
+(6, 6),
+(7, 13),
+(7, 14),
+(8, 21),
+(8, 23),
+(9, 31),
+(9, 35),
+(10, 1),
+(10, 3);
+
+INSERT INTO scores (_participant_id, segment, score) VALUES
+(11, 1, 1),
+(11, 2, 1),
+(12, 1, 0),
+(12, 2, 1),
+(13, 1, 1),
+(13, 2, 0),
+(13, 3, 1),
+(14, 1, 0),
+(14, 2, 1),
+(14, 3, 0),
+(15, 1, 28),
+(15, 2, 24),
+(15, 3, 30),
+(15, 4, 26),
+(16, 1, 25),
+(16, 2, 27),
+(16, 3, 22),
+(16, 4, 24),
+(17, 1, 7),
+(17, 2, 3),
+(17, 3, 10),
+(17, 4, 7),
+(18, 1, 3),
+(18, 2, 7),
+(18, 3, 7),
+(18, 4, 10),
+(19, 1, 1),
+(19, 2, 1),
+(20, 1, 0),
+(20, 2, 0);
