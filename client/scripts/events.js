@@ -1,4 +1,6 @@
 import { apiFetch } from "./api.js"
+import { dom } from "./dom.js"
+import { state } from "./state.js"
 import {
   runAsync,
   setMessage,
@@ -9,70 +11,7 @@ import {
   renderEvents
 } from "./ui.js"
 
-const dom = {
-  startAfter: document.getElementById("startAfter"),
-  endBefore: document.getElementById("endBefore"),
-  sportFilterChips: document.getElementById("sportFilterChips"),
-  competitionFilterList: document.getElementById("competitionFilterList"),
-  teamFilterList: document.getElementById("teamFilterList"),
-  loadEventsBtn: document.getElementById("loadEventsBtn"),
-  clearFiltersBtn: document.getElementById("clearFiltersBtn"),
-  eventsList: document.getElementById("eventsList"),
-  eventsCount: document.getElementById("eventsCount"),
-  openCreateModalBtn: document.getElementById("openCreateModalBtn"),
-  createModal: document.getElementById("createModal"),
-  createModalBackdrop: document.getElementById("createModalBackdrop"),
-  closeCreateModalBtn: document.getElementById("closeCreateModalBtn"),
-  cancelCreateBtn: document.getElementById("cancelCreateBtn"),
-  sportCreate: document.getElementById("sportCreate"),
-  competitionCreate: document.getElementById("competitionCreate"),
-  venueCreate: document.getElementById("venueCreate"),
-  teamOne: document.getElementById("teamOne"),
-  teamTwo: document.getElementById("teamTwo"),
-  stageId: document.getElementById("stageId"),
-  startTimeCreate: document.getElementById("startTimeCreate"),
-  createEventBtn: document.getElementById("createEventBtn"),
-  createMsg: document.getElementById("createMsg")
-}
-
-const state = {
-  sports: [],
-  filter: {
-    sportID: null,
-    teamIDs: []
-  },
-  filterOptions: {
-    teams: []
-  },
-  createOptions: {
-    competitions: [],
-    venues: [],
-    teams: []
-  }
-}
-
-function renderFilterSections() {
-  renderSportChips({
-    target: dom.sportFilterChips,
-    sports: state.sports,
-    activeID: state.filter.sportID,
-    includeAll: true,
-    onSelect: onFilterSportSelect
-  })
-
-  renderTeamFilter({
-    target: dom.teamFilterList,
-    teams: state.filterOptions.teams,
-    selectedTeamIDs: state.filter.teamIDs,
-    onToggle: (teamID, checked) => {
-      if (checked) {
-        state.filter.teamIDs.push(teamID)
-        return
-      }
-      state.filter.teamIDs = state.filter.teamIDs.filter((id) => id !== teamID)
-    }
-  })
-}
+// INITIAL LOADERS 
 
 async function loadSports() {
   const sports = await apiFetch("/api/sports/")
@@ -80,33 +19,6 @@ async function loadSports() {
 
   renderFilterSections()
   setSelectOptions(dom.sportCreate, state.sports, "sport_id", (sport) => titleCase(sport.name), "Select sport")
-}
-
-async function onFilterSportSelect(sportID) {
-  state.filter.sportID = sportID
-  state.filter.teamIDs = []
-  state.filterOptions.teams = []
-  renderFilterSections()
-
-  if (sportID === null) {
-    return
-  }
-
-  const options = await apiFetch(`/api/sports/${sportID}/event-options`)
-  state.filterOptions.competitions = Array.isArray(options.competitions) ? options.competitions : []
-  renderFilterSections()
-}
-
-async function loadTeamsForFilter() {
-  if (!state.filter.sportID) {
-    state.filterOptions.teams = []
-    renderFilterSections()
-    return
-  }
-
-  const teams = await apiFetch(`/api/sports/${state.filter.sportID}/teams`)
-  state.filterOptions.teams = Array.isArray(teams) ? teams : []
-  renderFilterSections()
 }
 
 async function loadEvents() {
@@ -122,9 +34,7 @@ async function loadEvents() {
   if (state.filter.sportID !== null) {
     payload.sport_id = state.filter.sportID
   }
-  if (state.filter.competitionID !== null) {
-    payload.competition_id = state.filter.competitionID
-  }
+
   if (state.filter.teamIDs.length > 0) {
     payload.team_ids = state.filter.teamIDs
   }
@@ -137,28 +47,111 @@ async function loadEvents() {
   renderEvents(dom.eventsList, dom.eventsCount, Array.isArray(events) ? events : [])
 }
 
+// FILTERING
+
+function renderFilterSections() {
+  renderSportChips({
+    target: dom.sportFilterChips,
+    sports: state.sports,
+    activeID: state.filter.sportID,
+    includeAll: true,
+    onSelect: onFilterSportSelect
+  })
+
+  renderTeamFilter({
+    target: dom.teamFilterList,
+    sportID: state.filter.sportID,
+    teams: state.filterOptions.teams,
+    selectedTeamIDs: state.filter.teamIDs,
+    onToggle: (teamID, checked) => {
+      if (checked) {
+        state.filter.teamIDs.push(teamID)
+        return
+      }
+      state.filter.teamIDs = state.filter.teamIDs.filter((id) => id !== teamID)
+    }
+  })
+}
+
+async function onFilterSportSelect(sportID) {
+  state.filter.sportID = sportID
+  state.filter.teamIDs = []
+  state.filterOptions.teams = []
+
+  if (sportID === null) {
+    return
+  }
+
+  const teams = await apiFetch(`/api/sports/${sportID}/teams`)
+  state.filterOptions.teams = Array.isArray(teams) ? teams : []
+  renderFilterSections()
+}
+
 function clearFilters() {
   state.filter.sportID = null
-  state.filter.competitionID = null
   state.filter.teamIDs = []
-  state.filterOptions.competitions = []
   state.filterOptions.teams = []
   renderFilterSections()
+}
+
+// CREATE FORM
+
+const teamNameLabel = (team) => (team.abbreviation ? `${team.name} (${team.abbreviation})` : team.name)
+
+function clearCreateSelects({ competition, venue, teams }) {
+  if (!competition) {
+    setSelectOptions(dom.competitionCreate, [], "competition_id", (c) => c.name, "Select competition")
+  }
+
+  if (!venue) {
+    setSelectOptions(dom.venueCreate, [], "venue_id", (v) => v.name, "Select venue")
+  }
+
+  if (!teams) {
+    setSelectOptions(dom.teamOne, [], "team_id", (t) => t.name, "Select team")
+    setSelectOptions(dom.teamTwo, [], "team_id", (t) => t.name, "Select team")
+  }
+}
+
+function disableCreateInputs({ competition, venue, teams }) {
+  dom.competitionCreate.disabled = !competition
+  dom.venueCreate.disabled = !venue
+  dom.teamOne.disabled = !teams
+  dom.teamTwo.disabled = !teams
+}
+
+function populateCreateSelects({ sport, competition } = {}) {
+  if (sport) {
+    setSelectOptions(
+      dom.competitionCreate,
+      state.createOptions.competitions,
+      "competition_id",
+      (competition) => competition.name,
+      "Select competition"
+    )
+
+    setSelectOptions(
+      dom.venueCreate,
+      state.createOptions.venues,
+      "venue_id",
+      (venue) => `${venue.name} (${venue.city?.name || "Unknown city"})`,
+      "Select venue"
+    )
+  }
+
+  if (competition) {
+    setSelectOptions(dom.teamOne, state.createOptions.teams, "team_id", teamNameLabel, "Select team")
+    setSelectOptions(dom.teamTwo, state.createOptions.teams, "team_id", teamNameLabel, "Select team")
+  }
 }
 
 function resetCreateForm() {
   setMessage(dom.createMsg, "", "")
   dom.sportCreate.value = ""
 
-  setSelectOptions(dom.competitionCreate, [], "competition_id", (c) => c.name, "Select competition")
-  setSelectOptions(dom.venueCreate, [], "venue_id", (v) => v.name, "Select venue")
-  setSelectOptions(dom.teamOne, [], "team_id", (t) => t.name, "Select team")
-  setSelectOptions(dom.teamTwo, [], "team_id", (t) => t.name, "Select team")
-
-  dom.competitionCreate.disabled = true
-  dom.venueCreate.disabled = true
-  dom.teamOne.disabled = true
-  dom.teamTwo.disabled = true
+  const disabledState = { competition: false, venue: false, teams: false }
+  clearCreateSelects(disabledState)
+  disableCreateInputs(disabledState)
 
   state.createOptions.competitions = []
   state.createOptions.venues = []
@@ -181,15 +174,9 @@ async function onCreateSportChange() {
   setMessage(dom.createMsg, "", "")
   const sportID = Number(dom.sportCreate.value)
 
-  setSelectOptions(dom.competitionCreate, [], "competition_id", (c) => c.name, "Select competition")
-  setSelectOptions(dom.venueCreate, [], "venue_id", (v) => v.name, "Select venue")
-  setSelectOptions(dom.teamOne, [], "team_id", (t) => t.name, "Select team")
-  setSelectOptions(dom.teamTwo, [], "team_id", (t) => t.name, "Select team")
-
-  dom.competitionCreate.disabled = true
-  dom.venueCreate.disabled = true
-  dom.teamOne.disabled = true
-  dom.teamTwo.disabled = true
+  const toSelect = { competition: false, venue: false, teams: false }
+  clearCreateSelects(toSelect)
+  disableCreateInputs(toSelect)
 
   if (!sportID) {
     return
@@ -199,34 +186,21 @@ async function onCreateSportChange() {
   state.createOptions.competitions = Array.isArray(options.competitions) ? options.competitions : []
   state.createOptions.venues = Array.isArray(options.venues) ? options.venues : []
 
-  setSelectOptions(
-    dom.competitionCreate,
-    state.createOptions.competitions,
-    "competition_id",
-    (competition) => competition.name,
-    "Select competition"
-  )
+  toSelect.competition = true
+  toSelect.venue = true
 
-  setSelectOptions(
-    dom.venueCreate,
-    state.createOptions.venues,
-    "venue_id",
-    (venue) => `${venue.name} (${venue.city?.name || "Unknown city"})`,
-    "Select venue"
-  )
-
-  dom.competitionCreate.disabled = false
-  dom.venueCreate.disabled = false
+  const selected = { sport: true }
+  populateCreateSelects(selected)
+  disableCreateInputs(toSelect)
 }
 
 async function onCreateCompetitionChange() {
   setMessage(dom.createMsg, "", "")
   const competitionID = Number(dom.competitionCreate.value)
 
-  setSelectOptions(dom.teamOne, [], "team_id", (t) => t.name, "Select team")
-  setSelectOptions(dom.teamTwo, [], "team_id", (t) => t.name, "Select team")
-  dom.teamOne.disabled = true
-  dom.teamTwo.disabled = true
+  const toSelect = { competition: true, venue: true, teams: false }
+  clearCreateSelects(toSelect)
+  disableCreateInputs(toSelect)
 
   if (!competitionID) {
     return
@@ -234,12 +208,12 @@ async function onCreateCompetitionChange() {
 
   const teams = await apiFetch(`/api/competitions/${competitionID}/teams`)
   state.createOptions.teams = Array.isArray(teams) ? teams : []
-  const teamLabel = (team) => (team.abbreviation ? `${team.name} (${team.abbreviation})` : team.name)
 
-  setSelectOptions(dom.teamOne, state.createOptions.teams, "team_id", teamLabel, "Select team")
-  setSelectOptions(dom.teamTwo, state.createOptions.teams, "team_id", teamLabel, "Select team")
-  dom.teamOne.disabled = false
-  dom.teamTwo.disabled = false
+  toSelect.teams = true
+
+  const selected = { competition: true }
+  populateCreateSelects(selected)
+  disableCreateInputs(toSelect)
 }
 
 function localDateTimeToRFC3339(localValue) {

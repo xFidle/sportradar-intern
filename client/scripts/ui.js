@@ -105,11 +105,16 @@ export function renderSportChips({ target, sports, activeID, includeAll, onSelec
   })
 }
 
-export function renderTeamFilter({ target, teams, selectedTeamIDs, onToggle }) {
+export function renderTeamFilter({ target, sportID, teams, selectedTeamIDs, onToggle }) {
   target.innerHTML = ""
 
+  if (!sportID) {
+    target.textContent = "Pick a sport to load teams."
+    return
+  }
+
   if (!teams.length) {
-    target.textContent = "No teams available for selected competition."
+    target.textContent = "No teams available for selected sport."
     return
   }
 
