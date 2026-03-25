@@ -635,15 +635,15 @@ INSERT INTO stages (name, round_order) VALUES
 
 INSERT INTO events (_competition_id, _venue_id, _stage_id, status, start_time, end_time) VALUES
 (1, 1, 1, 'scheduled', date_trunc('week', now()) + interval '2 days 19 hours', NULL),
-(1, 3, 1, 'scheduled', date_trunc('week', now()) + interval '3 days 20 hours', NULL),
-(2, 11, 1, 'scheduled', date_trunc('week', now()) + interval '5 days 18 hours', NULL),
-(3, 21, 1, 'scheduled', date_trunc('week', now()) + interval '6 days 15 hours', NULL),
-(4, 27, 1, 'scheduled', date_trunc('week', now()) + interval '7 days 20 hours', NULL),
-(1, 5, 1, 'finished', date_trunc('week', now()) - interval '26 days 20 hours', NULL),
-(2, 13, 1, 'finished', date_trunc('week', now()) - interval '19 days 19 hours', NULL),
-(3, 21, 1, 'finished', date_trunc('week', now()) - interval '13 days 21 hours', NULL),
-(4, 31, 1, 'finished', date_trunc('week', now()) - interval '8 days 18 hours', NULL),
-(1, 1, 1, 'finished', date_trunc('week', now()) - interval '3 days 20 hours', NULL);
+(1, 3, 1, 'scheduled', date_trunc('week', now()) + interval '9 days 20 hours', NULL),
+(2, 11, 1, 'scheduled', date_trunc('week', now()) + interval '11 days 18 hours', NULL),
+(3, 21, 1, 'scheduled', date_trunc('week', now()) + interval '4 days 15 hours', NULL),
+(4, 27, 1, 'scheduled', date_trunc('week', now()) + interval '10 days 20 hours', NULL),
+(1, 5, 1, 'finished', date_trunc('week', now()) - interval '26 days 4 hours', NULL),
+(2, 13, 1, 'finished', date_trunc('week', now()) - interval '19 days 5 hours', NULL),
+(3, 21, 1, 'finished', date_trunc('week', now()) - interval '13 days 3 hours', NULL),
+(4, 31, 1, 'finished', date_trunc('week', now()) - interval '8 days 6 hours', NULL),
+(1, 1, 1, 'finished', date_trunc('week', now()) - interval '3 days 4 hours', NULL);
 
 INSERT INTO participants (_event_id, _team_id) VALUES
 (1, 1),
