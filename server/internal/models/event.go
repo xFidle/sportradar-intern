@@ -21,12 +21,13 @@ type baseEvent struct {
 
 type Event struct {
 	baseEvent
-	Participants []Team `json:"participants"`
+	FinalScores  []FinalScore `json:"final_scores,omitempty"`
+	Participants []Team       `json:"participants"`
 }
 
 type DetailedEvent struct {
 	baseEvent
 	VenueName    string         `json:"venue_name"`
-	Scores       []Score        `json:"scores"`
+	Scores       []Score        `json:"scores,omitempty"`
 	Participants []DetailedTeam `json:"participants"`
 }

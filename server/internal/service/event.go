@@ -70,9 +70,12 @@ func (s *EventService) GetEvent(ctx context.Context, id int32) (*models.Detailed
 		return nil, err
 	}
 
-	scores, err := s.loader.fetchScoresByEventID(ctx, id)
-	if err != nil {
-		return nil, err
+	if event.Status != models.Scheduled {
+		scores, err := s.loader.fetchScoresByEventID(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+		event.Scores = scores
 	}
 
 	lookup := make(map[int32]*models.DetailedTeam)
@@ -87,7 +90,6 @@ func (s *EventService) GetEvent(ctx context.Context, id int32) (*models.Detailed
 	}
 
 	event.Participants = teams
-	event.Scores = scores
 
 	return event, nil
 }
@@ -104,6 +106,11 @@ func (s *EventService) GetEvents(ctx context.Context, filter models.Filter) ([]m
 		return nil, err
 	}
 
+	scores, err := s.loader.fetchFinalScoresByEventsIDs(ctx, eventIDs)
+	if err != nil {
+		return nil, err
+	}
+
 	lookup := make(map[int32]*models.Event)
 	for i := range events {
 		lookup[events[i].EventID] = &events[i]
@@ -112,6 +119,12 @@ func (s *EventService) GetEvents(ctx context.Context, filter models.Filter) ([]m
 	for _, t := range teams {
 		if e := lookup[t.eventID]; e != nil {
 			e.Participants = append(e.Participants, t.team)
+		}
+	}
+
+	for _, s := range scores {
+		if e := lookup[s.EventID]; e != nil && e.Status != models.Scheduled {
+			e.FinalScores = append(e.FinalScores, s.FinalScore)
 		}
 	}
 

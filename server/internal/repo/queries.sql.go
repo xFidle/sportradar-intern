@@ -311,6 +311,43 @@ func (q *Queries) ListEventsByFilter(ctx context.Context, arg ListEventsByFilter
 	return items, nil
 }
 
+const listFinalScoresByEventsIDs = `-- name: ListFinalScoresByEventsIDs :many
+SELECT
+    p._event_id,
+    p._team_id,
+    SUM(s.score) as agg_score
+FROM participants p
+JOIN scores s ON s._participant_id = p.participant_id
+WHERE p._event_id = ANY($1::int[])
+GROUP BY participant_id
+`
+
+type ListFinalScoresByEventsIDsRow struct {
+	EventID  int32
+	TeamID   int32
+	AggScore int64
+}
+
+func (q *Queries) ListFinalScoresByEventsIDs(ctx context.Context, eventIds []int32) ([]ListFinalScoresByEventsIDsRow, error) {
+	rows, err := q.db.Query(ctx, listFinalScoresByEventsIDs, eventIds)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListFinalScoresByEventsIDsRow
+	for rows.Next() {
+		var i ListFinalScoresByEventsIDsRow
+		if err := rows.Scan(&i.EventID, &i.TeamID, &i.AggScore); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listPlayersByTeamIDs = `-- name: ListPlayersByTeamIDs :many
 SELECT
     p.player_id,

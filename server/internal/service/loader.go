@@ -153,6 +153,29 @@ func (l *loader) fetchScoresByEventID(ctx context.Context, id int32) ([]models.S
 	return scores, nil
 }
 
+type eventFinalScore struct {
+	EventID    int32
+	FinalScore models.FinalScore
+}
+
+func (l *loader) fetchFinalScoresByEventsIDs(ctx context.Context, eventIDs []int32) ([]eventFinalScore, error) {
+	rows, err := l.q.ListFinalScoresByEventsIDs(ctx, eventIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	finalScores := make([]eventFinalScore, 0, len(rows))
+	for _, row := range rows {
+		var finalScore models.FinalScore
+		if err := copier.Copy(&finalScore, &row); err != nil {
+			return nil, err
+		}
+		finalScores = append(finalScores, eventFinalScore{EventID: row.EventID, FinalScore: finalScore})
+	}
+
+	return finalScores, nil
+}
+
 func (l *loader) checkVenueCorrectnes(ctx context.Context, competitionID, venueID int32) (bool, error) {
 	params := repo.IsVenueValidForCompetitionParams{CompetitionID: competitionID, VenueID: venueID}
 	return l.q.IsVenueValidForCompetition(ctx, params)

@@ -106,6 +106,17 @@ JOIN teams t ON t.team_id = p._team_id
 WHERE p._event_id = ANY(sqlc.arg('event_ids')::int[]);
 
 
+-- name: ListFinalScoresByEventsIDs :many
+SELECT
+    p._event_id,
+    p._team_id,
+    SUM(s.score) as agg_score
+FROM participants p
+JOIN scores s ON s._participant_id = p.participant_id
+WHERE p._event_id = ANY(sqlc.arg('event_ids')::int[])
+GROUP BY participant_id;
+
+
 -- name: ListScoresByEventID :many
 SELECT
     p._team_id,
