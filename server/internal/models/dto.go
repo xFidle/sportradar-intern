@@ -3,6 +3,7 @@ package models
 type Filter struct {
 	StartAfter string  `json:"start_after"        validate:"required"`
 	EndBefore  string  `json:"end_before"         validate:"required"`
+	Status     *Status `json:"status"`
 	SportID    *int32  `json:"sport_id,omitempty"`
 	TeamIDs    []int32 `json:"team_ids,omitempty"`
 }

@@ -256,16 +256,18 @@ JOIN sports s ON s.sport_id = c._sport_id
 WHERE 
     e.start_time >= $1
     AND e.start_time <= $2
-    AND c._sport_id = COALESCE($3, c._sport_id) 
-    AND $4::int[] IS NULL OR EXISTS 
+    AND e.status = COALESCE($3, e.status)
+    AND c._sport_id = COALESCE($4, c._sport_id) 
+    AND $5::int[] IS NULL OR EXISTS 
       (SELECT 1 FROM participants p
       WHERE p._event_id = e.event_id
-        AND p._team_id = ANY($4::int[]))
+        AND p._team_id = ANY($5::int[]))
 `
 
 type ListEventsByFilterParams struct {
 	StartAfter time.Time
 	EndBefore  time.Time
+	Status     NullStatus
 	SportID    *int32
 	TeamIds    []int32
 }
@@ -283,6 +285,7 @@ func (q *Queries) ListEventsByFilter(ctx context.Context, arg ListEventsByFilter
 	rows, err := q.db.Query(ctx, listEventsByFilter,
 		arg.StartAfter,
 		arg.EndBefore,
+		arg.Status,
 		arg.SportID,
 		arg.TeamIds,
 	)

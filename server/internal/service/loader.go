@@ -95,6 +95,13 @@ func (l *loader) fetchEventsByFilter(ctx context.Context, filter models.Filter) 
 		return nil, err
 	}
 
+	if filter.Status != nil {
+		params.Status = repo.NullStatus{
+			Status: repo.Status(string(*filter.Status)),
+			Valid:  true,
+		}
+	}
+
 	after, _ := time.Parse(util.DateLayout, filter.StartAfter)
 	before, _ := time.Parse(util.DateLayout, filter.EndBefore)
 

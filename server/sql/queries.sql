@@ -87,6 +87,7 @@ JOIN sports s ON s.sport_id = c._sport_id
 WHERE 
     e.start_time >= sqlc.arg('start_after')
     AND e.start_time <= sqlc.arg('end_before')
+    AND e.status = COALESCE(sqlc.narg('status'), e.status)
     AND c._sport_id = COALESCE(sqlc.narg('sport_id'), c._sport_id) 
     AND sqlc.narg('team_ids')::int[] IS NULL OR EXISTS 
       (SELECT 1 FROM participants p
