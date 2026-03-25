@@ -11,12 +11,11 @@ const (
 )
 
 type baseEvent struct {
-	EventID         int32           `json:"event_id"`
-	StartTime       time.Time       `json:"start_time"`
-	Status          Status          `json:"status"`
-	SportName       string          `json:"sport_name"`
-	CompetitionName string          `json:"competition_name"`
-	CompetitionType CompetitionType `json:"competition_type"`
+	EventID     int32       `json:"event_id"`
+	StartTime   time.Time   `json:"start_time"`
+	Status      Status      `json:"status"`
+	SportName   string      `json:"sport_name"`
+	Competition Competition `json:"competition"`
 }
 
 type Event struct {

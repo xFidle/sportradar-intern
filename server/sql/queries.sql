@@ -80,7 +80,8 @@ SELECT
     e.status,
     s.name AS sport_name,
     c.name AS competition_name,
-    c.type AS competition_type
+    c.type AS competition_type,
+    c.logo_path AS competition_logo
 FROM events e 
 JOIN competitions c ON c.competition_id = e._competition_id
 JOIN sports s ON s.sport_id = c._sport_id 

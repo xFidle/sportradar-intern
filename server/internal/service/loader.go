@@ -55,6 +55,7 @@ func (l *loader) fetchTeamsByEventID(ctx context.Context, id int32) ([]models.De
 		}
 
 		team.LogoPath = fmt.Sprintf("%s/%s", l.fAddr, team.LogoPath)
+
 		team.City = models.City{
 			Name:    row.CityName,
 			Country: models.Country{Name: row.CountryName, Code: row.CountryCode},
@@ -71,22 +72,22 @@ type teamPlayer struct {
 }
 
 func (l *loader) fetchPlayersByTeamID(ctx context.Context, ids []int32) ([]teamPlayer, error) {
-	result := make([]teamPlayer, 0, 11)
 	rows, err := l.q.ListPlayersByTeamIDs(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
 
+	players := make([]teamPlayer, 0, 11)
 	for _, row := range rows {
 		var player models.Player
 		if err := copier.Copy(&player, &row); err != nil {
 			return nil, err
 		}
 		player.Country = models.Country{Name: row.CountryName, Code: row.CountryCode}
-		result = append(result, teamPlayer{teamID: row.TeamID, player: player})
+		players = append(players, teamPlayer{teamID: row.TeamID, player: player})
 	}
 
-	return result, nil
+	return players, nil
 }
 
 func (l *loader) fetchEventsByFilter(ctx context.Context, filter models.Filter) ([]models.Event, error) {
@@ -113,9 +114,19 @@ func (l *loader) fetchEventsByFilter(ctx context.Context, filter models.Filter) 
 		return nil, err
 	}
 
-	var events []models.Event
-	if err := copier.Copy(&events, &rows); err != nil {
-		return nil, err
+	events := make([]models.Event, len(rows))
+	for i := range events {
+		if err := copier.Copy(&events[i], &rows[i]); err != nil {
+			return nil, err
+		}
+		events[i].Competition = models.Competition{
+			Name: rows[i].CompetitionName,
+			Type: models.CompetitionType(rows[i].CompetitionType),
+		}
+
+		if rows[i].CompetitionLogo != nil {
+			events[i].Competition.LogoPath = fmt.Sprintf("%s/%s", l.fAddr, *rows[i].CompetitionLogo)
+		}
 	}
 
 	return events, nil

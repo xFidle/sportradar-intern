@@ -10,8 +10,8 @@ const (
 )
 
 type Competition struct {
-	CompetitionID int32           `json:"competition_id"`
+	CompetitionID int32           `json:"competition_id,omitempty"`
 	Name          string          `json:"name"`
 	Type          CompetitionType `json:"type"`
-	LogoPath      string          `json:"logo_path"`
+	LogoPath      string          `json:"logo,omitempty"`
 }

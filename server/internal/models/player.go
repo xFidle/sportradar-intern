@@ -1,7 +1,7 @@
 package models
 
 type Player struct {
-	PlayerID  int32   `json:"player_id"`
+	PlayerID  int32   `json:"player_id,omitempty"`
 	FirstName string  `json:"first_name"`
 	LastName  string  `json:"last_name"`
 	Country   Country `json:"country"`
