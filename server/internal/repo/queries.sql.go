@@ -40,6 +40,7 @@ SELECT
     e.status,
     s.name AS sport_name,
     c.name AS competition_name,
+    c.type AS competition_type,
     v.name AS venue_name
 FROM events e
 JOIN venues v ON v.venue_id = e._venue_id 
@@ -55,6 +56,7 @@ type GetDetailedEventByIDRow struct {
 	Status          Status
 	SportName       string
 	CompetitionName string
+	CompetitionType CompetitionType
 	VenueName       string
 }
 
@@ -68,6 +70,7 @@ func (q *Queries) GetDetailedEventByID(ctx context.Context, eventID int32) (GetD
 		&i.Status,
 		&i.SportName,
 		&i.CompetitionName,
+		&i.CompetitionType,
 		&i.VenueName,
 	)
 	return i, err
@@ -236,7 +239,8 @@ SELECT
     e.start_time,
     e.status,
     s.name AS sport_name,
-    c.name AS competition_name 
+    c.name AS competition_name,
+    c.type AS competition_type
 FROM events e 
 JOIN competitions c ON c.competition_id = e._competition_id
 JOIN sports s ON s.sport_id = c._sport_id 
@@ -265,6 +269,7 @@ type ListEventsByFilterRow struct {
 	Status          Status
 	SportName       string
 	CompetitionName string
+	CompetitionType CompetitionType
 }
 
 func (q *Queries) ListEventsByFilter(ctx context.Context, arg ListEventsByFilterParams) ([]ListEventsByFilterRow, error) {
@@ -288,6 +293,7 @@ func (q *Queries) ListEventsByFilter(ctx context.Context, arg ListEventsByFilter
 			&i.Status,
 			&i.SportName,
 			&i.CompetitionName,
+			&i.CompetitionType,
 		); err != nil {
 			return nil, err
 		}

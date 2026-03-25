@@ -197,7 +197,6 @@ type Player struct {
 	ShirtNumber int32
 	BirthDate   pgtype.Date
 	Height      int32
-	PhotoPath   *string
 }
 
 type Playground struct {

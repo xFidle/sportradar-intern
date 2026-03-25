@@ -34,6 +34,7 @@ SELECT
     e.status,
     s.name AS sport_name,
     c.name AS competition_name,
+    c.type AS competition_type,
     v.name AS venue_name
 FROM events e
 JOIN venues v ON v.venue_id = e._venue_id 
@@ -78,7 +79,8 @@ SELECT
     e.start_time,
     e.status,
     s.name AS sport_name,
-    c.name AS competition_name 
+    c.name AS competition_name,
+    c.type AS competition_type
 FROM events e 
 JOIN competitions c ON c.competition_id = e._competition_id
 JOIN sports s ON s.sport_id = c._sport_id 
