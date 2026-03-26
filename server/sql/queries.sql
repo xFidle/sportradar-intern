@@ -66,6 +66,7 @@ SELECT
     p._team_id,
     p.first_name,
     p.last_name,
+    p.shirt_number,
     co.name AS country_name,
     co.code AS country_code
 FROM players p

@@ -1,10 +1,11 @@
 package models
 
 type Player struct {
-	PlayerID  int32   `json:"player_id,omitempty"`
-	FirstName string  `json:"first_name"`
-	LastName  string  `json:"last_name"`
-	Country   Country `json:"country"`
+	PlayerID    int32   `json:"player_id,omitempty"`
+	FirstName   string  `json:"first_name"`
+	LastName    string  `json:"last_name"`
+	ShirtNumber int32   `json:"shirt_number"`
+	Country     Country `json:"country"`
 }
 
 type DetailedPlayer struct {

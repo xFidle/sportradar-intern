@@ -360,6 +360,7 @@ SELECT
     p._team_id,
     p.first_name,
     p.last_name,
+    p.shirt_number,
     co.name AS country_name,
     co.code AS country_code
 FROM players p
@@ -372,6 +373,7 @@ type ListPlayersByTeamIDsRow struct {
 	TeamID      int32
 	FirstName   string
 	LastName    string
+	ShirtNumber int32
 	CountryName string
 	CountryCode string
 }
@@ -390,6 +392,7 @@ func (q *Queries) ListPlayersByTeamIDs(ctx context.Context, teamIds []int32) ([]
 			&i.TeamID,
 			&i.FirstName,
 			&i.LastName,
+			&i.ShirtNumber,
 			&i.CountryName,
 			&i.CountryCode,
 		); err != nil {
