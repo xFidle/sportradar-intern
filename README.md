@@ -20,6 +20,11 @@ To start the application, run:
 docker compose up
 ```
 
+When application is running, simply enter the following url:
+```
+http://localhost:5050
+```
+
 ### Backend
 Backend is a REST API written in `Go` mostly  using language essentials (`context` and `net/http` packages). 
 
