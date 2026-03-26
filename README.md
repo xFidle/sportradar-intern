@@ -139,6 +139,10 @@ results.
 #### Mainpage
 <img width="1476" height="794" alt="image" src="https://github.com/user-attachments/assets/0f135512-c394-4e74-b13f-6b6991284043" />
 
+#### Event details
+<img width="1340" height="1031" alt="image" src="https://github.com/user-attachments/assets/2ee6bb4b-011d-48ba-a0c0-b2145aa50380" />
+
+
 #### Overview 
 Frontend is a simple web application written in vanilla JavaScript, HTML and CSS. It allows
 for browsing and adding new events.
