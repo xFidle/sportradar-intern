@@ -93,7 +93,7 @@ body {
   font-size: 1.05rem;
 }
 
-.panel + .panel {
+.panel+.panel {
   margin-top: 1rem;
 }
 
@@ -557,6 +557,7 @@ button:disabled {
 }
 
 @media (max-width: 760px) {
+
   .span-6,
   .span-4 {
     grid-column: span 12;
@@ -718,6 +719,14 @@ button:disabled {
 .detail-team-country {
   font-size: 0.8rem;
   color: var(--muted);
+}
+
+.detail-team-score-inline {
+  margin-left: auto;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text);
 }
 
 .detail-roster {

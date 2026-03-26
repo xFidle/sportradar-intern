@@ -291,42 +291,17 @@ export function renderEventDetail(target, event) {
   `
   target.appendChild(header)
 
+  const participants = Array.isArray(event.participants) ? event.participants : []
+  const scoresByTeam = {}
   if (isFinished) {
-    const scoreRow = document.createElement("div")
-    scoreRow.className = "detail-scores"
-
-    const participants = Array.isArray(event.participants) ? event.participants : []
-    const scoresByTeam = {}
     for (const s of event.scores || []) {
       const tid = Number(s.team_id)
       scoresByTeam[tid] = (scoresByTeam[tid] || 0) + (s.socre || 0)
     }
-
-    const teamScores = participants.map((p) => ({
-      team: p,
-      total: scoresByTeam[Number(p.team_id)] || 0
-    }))
-
-    if (teamScores.length >= 2) {
-      scoreRow.innerHTML = `
-        <div class="detail-team-score">
-          <span class="detail-team-score-name">${teamScores[0].team.name}</span>
-          <span class="detail-team-score-num">${teamScores[0].total}</span>
-        </div>
-        <span class="detail-score-sep">-</span>
-        <div class="detail-team-score">
-          <span class="detail-team-score-num">${teamScores[1].total}</span>
-          <span class="detail-team-score-name">${teamScores[1].team.name}</span>
-        </div>
-      `
-    }
-    target.appendChild(scoreRow)
   }
 
   const teams = document.createElement("div")
   teams.className = "detail-teams"
-
-  const participants = Array.isArray(event.participants) ? event.participants : []
 
   participants.forEach((participant) => {
     const col = document.createElement("div")
@@ -336,12 +311,14 @@ export function renderEventDetail(target, event) {
     teamHeader.className = "detail-team-header"
     const teamFlag = countryCodeToFlag(participant.city?.country?.code)
     const teamFlagDisplay = teamFlag ? `${teamFlag} ${participant.city?.country?.name || ""}` : participant.city?.country?.name || ""
+    const score = isFinished ? scoresByTeam[Number(participant.team_id)] : undefined
     teamHeader.innerHTML = `
       ${participant.logo ? `<img class="detail-team-logo" src="${participant.logo}" alt="${participant.name}" />` : `<span class="detail-team-logo-fallback">${(participant.abbreviation || participant.name || "?").slice(0, 2).toUpperCase()}</span>`}
       <div class="detail-team-info">
         <span class="detail-team-name">${participant.name || "Unknown"}</span>
         ${teamFlagDisplay ? `<span class="detail-team-country">${teamFlagDisplay}</span>` : ""}
       </div>
+      ${score !== undefined ? `<span class="detail-team-score-inline">${score}</span>` : ""}
     `
     col.appendChild(teamHeader)
 
