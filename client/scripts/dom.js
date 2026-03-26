@@ -20,5 +20,9 @@ export const dom = {
   teamTwo: document.getElementById("teamTwo"),
   startTimeCreate: document.getElementById("startTimeCreate"),
   createEventBtn: document.getElementById("createEventBtn"),
-  createMsg: document.getElementById("createMsg")
+  createMsg: document.getElementById("createMsg"),
+  detailModal: document.getElementById("detailModal"),
+  detailModalBackdrop: document.getElementById("detailModalBackdrop"),
+  closeDetailModalBtn: document.getElementById("closeDetailModalBtn"),
+  eventDetailBody: document.getElementById("eventDetailBody")
 }

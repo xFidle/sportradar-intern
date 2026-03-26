@@ -562,3 +562,225 @@ button:disabled {
     grid-column: span 12;
   }
 }
+
+/* Clickable event cards */
+
+.event-card {
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.event-card:hover,
+.event-card:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(26, 41, 48, 0.12);
+}
+
+.event-card:focus-visible {
+  outline: 2px solid rgba(31, 122, 140, 0.4);
+  outline-offset: 2px;
+}
+
+/* Event detail modal */
+
+.detail-body {
+  padding: 0.25rem 0;
+}
+
+.detail-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.detail-meta {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.detail-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.detail-competition {
+  margin: 0;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.1rem;
+}
+
+.detail-datetime {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.detail-venue {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.detail-scores {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.7rem;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 0.8rem;
+}
+
+.detail-team-score {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.detail-team-score-num {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.detail-team-score-name {
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.detail-score-sep {
+  font-size: 1.4rem;
+  color: var(--border);
+}
+
+.detail-teams {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
+
+.detail-team-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detail-team-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.detail-team-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  object-fit: cover;
+  background: var(--surface-soft);
+  flex-shrink: 0;
+}
+
+.detail-team-logo-fallback {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.detail-team-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.detail-team-name {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.detail-team-country {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.detail-roster {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.detail-roster-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.28rem 0.4rem;
+  border-radius: 8px;
+  transition: background 100ms ease;
+}
+
+.detail-roster-row:hover {
+  background: var(--surface-soft);
+}
+
+.detail-roster-empty {
+  font-size: 0.85rem;
+  color: var(--muted);
+  padding: 0.2rem 0.4rem;
+  font-style: italic;
+}
+
+.jersey-badge {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: var(--accent);
+  min-width: 2rem;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.detail-player-name {
+  font-size: 0.9rem;
+  color: var(--text);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.detail-player-flag {
+  font-size: 1rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+@media (max-width: 560px) {
+  .detail-teams {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-team-score-name {
+    max-width: 80px;
+  }
+}

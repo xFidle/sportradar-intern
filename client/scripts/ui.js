@@ -172,7 +172,7 @@ function makeCompetitionLogoNode(competition) {
 }
 
 
-export function renderEvents(target, countTarget, events) {
+export function renderEvents(target, countTarget, events, onCardClick) {
   target.innerHTML = ""
 
   if (!events.length) {
@@ -186,6 +186,8 @@ export function renderEvents(target, countTarget, events) {
   events.forEach((event) => {
     const card = document.createElement("article")
     card.className = "event-card"
+    card.dataset.eventId = String(event.event_id)
+    card.tabIndex = 0
 
     const status = normalizeStatus(event.status)
     const statusCls = statusClass(event.status)
@@ -242,5 +244,132 @@ export function renderEvents(target, countTarget, events) {
     target.appendChild(card)
   })
 
+  if (onCardClick) {
+    target.addEventListener("click", onCardClick)
+    target.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        onCardClick(e)
+      }
+    })
+  }
+
   countTarget.textContent = `${events.length} event${events.length === 1 ? "" : "s"}`
+}
+
+export function countryCodeToFlag(code) {
+  if (!code || code.length !== 2) {
+    return code || ""
+  }
+  if (code.toUpperCase() === "EN" || code.toUpperCase() === "SC" || code.toUpperCase() === "WL") {
+    code = "GB"
+  }
+  const offset = 127397
+  const codePoints = [...code.toUpperCase()].map((c) => c.codePointAt(0) + offset)
+  return String.fromCodePoint(...codePoints)
+}
+
+export function renderEventDetail(target, event) {
+  target.innerHTML = ""
+
+  const status = normalizeStatus(event.status)
+  const statusCls = statusClass(event.status)
+  const competition = event.competition || {}
+  const isFinished = String(event.status || "").toLowerCase() === "finished"
+
+  const header = document.createElement("div")
+  header.className = "detail-header"
+  header.innerHTML = `
+    <div class="detail-meta">
+      <span class="badge">${titleCase(event.sport_name || "Unknown sport")}</span>
+      <span class="badge ${statusCls}">${status}</span>
+    </div>
+    <div class="detail-info">
+      <h4 class="detail-competition">${competition.name || "Unknown competition"}</h4>
+      <p class="detail-datetime">${formatDate(event.start_time)}</p>
+      <p class="detail-venue">${event.venue_name || "Unknown venue"}</p>
+    </div>
+  `
+  target.appendChild(header)
+
+  if (isFinished) {
+    const scoreRow = document.createElement("div")
+    scoreRow.className = "detail-scores"
+
+    const participants = Array.isArray(event.participants) ? event.participants : []
+    const scoresByTeam = {}
+    for (const s of event.scores || []) {
+      const tid = Number(s.team_id)
+      scoresByTeam[tid] = (scoresByTeam[tid] || 0) + (s.socre || 0)
+    }
+
+    const teamScores = participants.map((p) => ({
+      team: p,
+      total: scoresByTeam[Number(p.team_id)] || 0
+    }))
+
+    if (teamScores.length >= 2) {
+      scoreRow.innerHTML = `
+        <div class="detail-team-score">
+          <span class="detail-team-score-name">${teamScores[0].team.name}</span>
+          <span class="detail-team-score-num">${teamScores[0].total}</span>
+        </div>
+        <span class="detail-score-sep">-</span>
+        <div class="detail-team-score">
+          <span class="detail-team-score-num">${teamScores[1].total}</span>
+          <span class="detail-team-score-name">${teamScores[1].team.name}</span>
+        </div>
+      `
+    }
+    target.appendChild(scoreRow)
+  }
+
+  const teams = document.createElement("div")
+  teams.className = "detail-teams"
+
+  const participants = Array.isArray(event.participants) ? event.participants : []
+
+  participants.forEach((participant) => {
+    const col = document.createElement("div")
+    col.className = "detail-team-col"
+
+    const teamHeader = document.createElement("div")
+    teamHeader.className = "detail-team-header"
+    const teamFlag = countryCodeToFlag(participant.city?.country?.code)
+    const teamFlagDisplay = teamFlag ? `${teamFlag} ${participant.city?.country?.name || ""}` : participant.city?.country?.name || ""
+    teamHeader.innerHTML = `
+      ${participant.logo ? `<img class="detail-team-logo" src="${participant.logo}" alt="${participant.name}" />` : `<span class="detail-team-logo-fallback">${(participant.abbreviation || participant.name || "?").slice(0, 2).toUpperCase()}</span>`}
+      <div class="detail-team-info">
+        <span class="detail-team-name">${participant.name || "Unknown"}</span>
+        ${teamFlagDisplay ? `<span class="detail-team-country">${teamFlagDisplay}</span>` : ""}
+      </div>
+    `
+    col.appendChild(teamHeader)
+
+    const roster = document.createElement("ul")
+    roster.className = "detail-roster"
+
+    const players = Array.isArray(participant.players) ? participant.players : []
+    if (!players.length) {
+      const empty = document.createElement("li")
+      empty.className = "detail-roster-empty"
+      empty.textContent = "No roster available"
+      roster.appendChild(empty)
+    } else {
+      players.forEach((player) => {
+        const li = document.createElement("li")
+        li.className = "detail-roster-row"
+        const playerFlag = countryCodeToFlag(player.country?.code)
+        li.innerHTML = `
+          ${playerFlag ? `<span class="detail-player-flag">${playerFlag}</span>` : ""}
+          <span class="jersey-badge">#${player.shirt_number}</span>
+          <span class="detail-player-name">${player.first_name} ${player.last_name}</span>
+        `
+        roster.appendChild(li)
+      })
+    }
+    col.appendChild(roster)
+    teams.appendChild(col)
+  })
+
+  target.appendChild(teams)
 }

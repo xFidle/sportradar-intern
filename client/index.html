@@ -132,6 +132,17 @@
     </section>
   </div>
 
+  <div id="detailModal" class="modal" aria-hidden="true">
+    <div id="detailModalBackdrop" class="modal-backdrop"></div>
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="detailModalTitle">
+      <div class="modal-header">
+        <h3 id="detailModalTitle">Event Details</h3>
+        <button id="closeDetailModalBtn" class="close-btn" type="button" aria-label="Close">x</button>
+      </div>
+      <div id="eventDetailBody" class="detail-body"></div>
+    </section>
+  </div>
+
   <script type="module" src="./scripts/events.js"></script>
 </body>
 

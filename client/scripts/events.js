@@ -8,7 +8,8 @@ import {
   setSelectOptions,
   renderSportChips,
   renderTeamFilter,
-  renderEvents
+  renderEvents,
+  renderEventDetail
 } from "./ui.js"
 
 // INITIAL LOADERS 
@@ -48,7 +49,7 @@ async function loadEvents() {
     body: JSON.stringify(payload)
   })
 
-  renderEvents(dom.eventsList, dom.eventsCount, Array.isArray(events) ? events : [])
+  renderEvents(dom.eventsList, dom.eventsCount, Array.isArray(events) ? events : [], runAsync(onEventCardClick))
 }
 
 // FILTERING
@@ -337,6 +338,34 @@ function setupDefaults() {
   dom.startTimeCreate.value = `${yyyy}-${mm}-${dd}T${hh}:${min}`
 }
 
+function openDetailModal() {
+  dom.detailModal.classList.add("open")
+  dom.detailModal.setAttribute("aria-hidden", "false")
+  document.body.style.overflow = "hidden"
+}
+
+function closeDetailModal() {
+  dom.detailModal.classList.remove("open")
+  dom.detailModal.setAttribute("aria-hidden", "true")
+  document.body.style.overflow = ""
+}
+
+async function onEventCardClick(event) {
+  const card = event.target.closest(".event-card")
+  if (!card) {
+    return
+  }
+
+  const eventID = card.dataset.eventId
+  if (!eventID) {
+    return
+  }
+
+  const detail = await apiFetch(`/api/events/${eventID}`)
+  renderEventDetail(dom.eventDetailBody, detail)
+  openDetailModal()
+}
+
 function bindModalEvents() {
   const closeAndReset = () => {
     closeCreateModal()
@@ -348,9 +377,15 @@ function bindModalEvents() {
   dom.cancelCreateBtn.addEventListener("click", closeAndReset)
   dom.createModalBackdrop.addEventListener("click", closeAndReset)
 
+  dom.closeDetailModalBtn.addEventListener("click", closeDetailModal)
+  dom.detailModalBackdrop.addEventListener("click", closeDetailModal)
+
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && dom.createModal.classList.contains("open")) {
       closeAndReset()
+    }
+    if (event.key === "Escape" && dom.detailModal.classList.contains("open")) {
+      closeDetailModal()
     }
   })
 }
