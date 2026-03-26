@@ -1,7 +1,5 @@
-const API_BASE = "http://localhost:8080" // will be defined in container later on
-
 export async function apiFetch(path, options = {}) {
-  const res = await fetch(`${API_BASE}${path}`, {
+  const res = await fetch(`${path}`, {
     headers: { "Content-Type": "application/json", ...(options.headers || {}) },
     ...options
   })
