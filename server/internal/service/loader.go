@@ -38,6 +38,11 @@ func (l *loader) fetchEventByID(ctx context.Context, id int32) (*models.Detailed
 		return nil, err
 	}
 
+	event.Competition = models.Competition{
+		Name: row.CompetitionName,
+		Type: models.CompetitionType(row.CompetitionType),
+	}
+
 	return &event, nil
 }
 
