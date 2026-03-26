@@ -137,7 +137,7 @@ results.
 ### Frontend
 
 #### Mainpage
-<img width="2560" height="1293" alt="image" src="https://github.com/user-attachments/assets/56d51b85-d3c2-49bd-acb3-602728d88511" />
+<img width="1476" height="794" alt="image" src="https://github.com/user-attachments/assets/0f135512-c394-4e74-b13f-6b6991284043" />
 
 #### Overview 
 Frontend is a simple web application written in vanilla JavaScript, HTML and CSS. It allows
