@@ -86,12 +86,10 @@ GET "/sports/{sport_id}/event-options"     - return
 GET "/competitions/{competition_id}/teams" - 
 ```
 
-
-
 ### Database
 
 #### ERD
-
+<img width="1708" height="1120" alt="image" src="https://github.com/user-attachments/assets/002d589b-4003-4ec4-9263-019ecc6c56a9" />
 
 
 ####
@@ -105,6 +103,7 @@ separation between assets bucket, backend and db (db stores only urls)
 ### Frontend
 
 #### Mainpage
+<img width="2560" height="1293" alt="image" src="https://github.com/user-attachments/assets/56d51b85-d3c2-49bd-acb3-602728d88511" />
 #### Potential improvements
 caching
 
